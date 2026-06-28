@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="РУС.ДРЕЛЬ">
+<meta name="theme-color" content="#2b2e28">
+<title>МИНИСТЕРСТВО ЯЗЫКА</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+/* ── FONTS ── */
+@font-face {
+  font-family: 'Handjet';
+  src: url('fonts/Handjet-Regular.woff2') format('woff2');
+  font-weight: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IBMPlexMono';
+  src: url('fonts/IBMPlexMono-Regular.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: 'IBMPlexMono';
+  src: url('fonts/IBMPlexMono-Bold.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+}
+
+/* ── RESET & ROOT ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --desk:    #2b2e28;
+  --hdr:     #c9bf9f;
+  --doc:     #d8cfb2;
+  --ink:     #23241d;
+  --red:     #8a2b22;
+  --green:   #5b6b39;
+  --amber:   #9a7b2e;
+  --cyan:    #386f6a;
+  --rule:    #6e6a55;
+  --muted:   #7a6f4e;
+  --fnt-dot: 'Handjet', 'Pixelify Sans', monospace;
+  --fnt-body:'IBMPlexMono', 'Courier New', monospace;
+}
+html, body {
+  height: 100%; width: 100%; overflow: hidden;
+  background: var(--desk);
+  font-family: var(--fnt-body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCANLINE GRAIN ── */
+.scan::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg, rgba(0,0,0,.05) 0, rgba(0,0,0,.05) 1px,
+    transparent 1px, transparent 3px);
+  z-index: 1;
+}
+
+/* ── LAYOUT ── */
+#app {
+  display: flex; flex-direction: column;
+  height: 100%; max-width: 520px; margin: 0 auto;
+  position: relative; overflow: hidden;
+}
+
+/* ── HEADER ── */
+#hdr {
+  background: var(--hdr);
+  border-bottom: 2px double var(--rule);
+  padding: 8px 12px 6px;
+  flex-shrink: 0;
+  position: relative;
+}
+.hdr-top {
+  display: flex; align-items: center; gap: 8px;
+}
+.emblem svg { flex-shrink: 0; display: block; }
+.ministry-name {
+  flex: 1;
+  font-family: var(--fnt-dot);
+  font-size: 15px;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: .03em;
+}
+.ministry-sub {
+  font-family: var(--fnt-body);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .12em;
+  margin-top: 1px;
+}
+.hdr-meta {
+  display: flex; gap: 12px; margin-top: 5px;
+  font-size: 9px; color: var(--muted); letter-spacing: .1em;
+}
+.hdr-meta span { font-family: var(--fnt-dot); font-size: 11px; }
+
+/* ── NAV TABS ── */
+#nav {
+  display: flex;
+  background: var(--ink);
+  border-bottom: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+.nav-btn {
+  flex: 1; padding: 6px 4px; border: none; cursor: pointer;
+  background: transparent;
+  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .06em;
+  color: var(--muted);
+  border-right: 1px solid var(--rule);
+  transition: background .15s, color .15s;
+}
+.nav-btn:last-child { border-right: none; }
+.nav-btn.active { background: var(--hdr); color: var(--ink); }
+.nav-btn:not(.active):hover { background: #3a3d37; color: var(--hdr); }
+
+/* ── SCREENS ── */
+.screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.screen.active { display: flex; }
+
+/* ── DRILL SCREEN ── */
+#drill-screen { background: var(--desk); }
+
+#session-start {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex: 1; gap: 20px; padding: 24px;
+}
+.ss-title {
+  font-family: var(--fnt-dot); font-size: 22px; color: var(--hdr);
+  text-align: center; letter-spacing: .05em;
+}
+.ss-sub {
+  font-size: 11px; color: var(--muted); text-align: center;
+  letter-spacing: .1em; line-height: 1.6;
+}
+.ss-stats {
+  background: var(--ink); border: 1px solid var(--rule);
+  padding: 10px 20px; font-size: 10px; color: var(--muted);
+  letter-spacing: .1em; text-align: center; font-family: var(--fnt-dot);
+}
+.ss-stats span { color: var(--hdr); font-size: 14px; }
+
+#no-russian-voice {
+  display: none;
+  background: #3a1a10; border: 1px solid var(--red);
+  padding: 8px 12px; font-size: 10px; color: #c4816e;
+  text-align: center; letter-spacing: .06em; line-height: 1.5;
+}
+
+#drill-area {
+  display: none; flex-direction: column; flex: 1; overflow-y: auto;
+  padding: 0 0 8px;
+}
+
+/* DOSSIER CARD */
+.dossier {
+  background: var(--doc); margin: 8px; border: 1px solid var(--rule);
+  position: relative; overflow: hidden; padding-bottom: 8px;
+}
+.dossier::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg, rgba(0,0,0,.04) 0, rgba(0,0,0,.04) 1px,
+    transparent 1px, transparent 3px);
+}
+.dossier-header {
+  background: var(--hdr); border-bottom: 1px solid var(--rule);
+  padding: 5px 10px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.dossier-label {
+  font-family: var(--fnt-dot); font-size: 10px; letter-spacing: .1em;
+  color: var(--muted);
+}
+.clearance-badge {
+  font-family: var(--fnt-dot); font-size: 10px;
+  color: var(--cyan); letter-spacing: .08em;
+}
+.dossier-section {
+  padding: 8px 12px 4px;
+  border-bottom: 1px dotted var(--rule);
+}
+.dossier-section:last-child { border-bottom: none; }
+.field-label {
+  font-size: 9px; color: var(--muted); letter-spacing: .14em;
+  text-transform: uppercase; margin-bottom: 3px;
+  font-family: var(--fnt-dot);
+}
+.field-value {
+  font-size: 16px; line-height: 1.4; color: var(--ink);
+  font-family: var(--fnt-body);
+}
+.field-translit {
+  font-size: 12px; color: var(--cyan); margin-top: 2px;
+  font-style: italic; letter-spacing: .02em;
+}
+.hidden-answer {
+  font-size: 16px; color: var(--rule);
+  letter-spacing: .25em; font-family: var(--fnt-dot);
+  cursor: pointer; user-select: none;
+  padding: 4px 0;
+}
+.tag-row {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+}
+.gram-tag {
+  font-family: var(--fnt-dot); font-size: 9px; letter-spacing: .08em;
+  color: var(--muted); border: 1px solid var(--rule);
+  padding: 1px 5px;
+}
+
+/* GAP TIMER */
+.gap-bar-wrap {
+  margin: 6px 12px 0;
+  height: 6px; background: var(--rule); position: relative;
+}
+.gap-bar {
+  height: 100%; background: var(--cyan);
+  transition: width .1s linear;
+}
+.gap-label {
+  font-family: var(--fnt-dot); font-size: 10px; color: var(--cyan);
+  text-align: right; padding: 2px 12px 0;
+  letter-spacing: .06em;
+}
+
+/* AUDIO BUTTON */
+.audio-btn {
+  margin: 8px 12px 4px;
+  background: var(--cyan); border: none; padding: 8px 14px;
+  font-family: var(--fnt-dot); font-size: 12px; color: var(--doc);
+  letter-spacing: .1em; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  width: calc(100% - 24px);
+}
+.audio-btn:active { filter: brightness(.85); }
+.audio-btn svg { flex-shrink: 0; }
+
+/* GRADING STAMPS */
+.grade-row {
+  display: flex; gap: 8px; padding: 8px 12px 4px; flex-wrap: wrap;
+}
+.stamp {
+  flex: 1; min-width: 80px;
+  display: flex; flex-direction: column; align-items: center;
+  border: 2px solid; padding: 8px 6px 6px;
+  cursor: pointer; position: relative;
+  font-family: var(--fnt-dot); letter-spacing: .06em;
+  transform: rotate(0deg); transition: transform .1s, filter .1s;
+  user-select: none;
+}
+.stamp:active { filter: brightness(.8); transform: rotate(-1deg) scale(.97); }
+.stamp-main { font-size: 14px; text-align: center; line-height: 1.1; }
+.stamp-sub  { font-size: 9px;  text-align: center; margin-top: 4px; opacity: .75; }
+.stamp.approved  { border-color: var(--green); color: var(--green);
+  transform: rotate(-1.5deg); }
+.stamp.shaky    { border-color: var(--amber); color: var(--amber);
+  transform: rotate(.8deg); }
+.stamp.denied   { border-color: var(--red);   color: var(--red);
+  transform: rotate(-2deg); }
+.stamp::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 4px,
+    rgba(0,0,0,.03) 4px, rgba(0,0,0,.03) 5px);
+}
+
+/* FOOTER SERVICE RECORD */
+#service-record {
+  background: var(--ink); border-top: 1px solid var(--rule);
+  padding: 6px 12px; flex-shrink: 0;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.service-label {
+  font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
+  letter-spacing: .1em;
+}
+.stazh-boxes {
+  display: flex; gap: 3px; margin-top: 2px;
+}
+.stazh-box {
+  width: 10px; height: 10px; border: 1px solid var(--rule);
+}
+.stazh-box.filled { background: var(--green); border-color: var(--green); }
+.session-info {
+  font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
+  text-align: right; letter-spacing: .06em;
+}
+
+/* ── DECK LIST SCREEN ── */
+#deck-screen {
+  background: var(--desk); overflow-y: auto;
+}
+.deck-toolbar {
+  background: var(--hdr); border-bottom: 2px double var(--rule);
+  padding: 8px 12px;
+  display: flex; gap: 8px; align-items: center;
+}
+.deck-title {
+  font-family: var(--fnt-dot); font-size: 14px; color: var(--ink);
+  flex: 1; letter-spacing: .05em;
+}
+.tool-btn {
+  background: var(--ink); border: none; color: var(--hdr);
+  font-family: var(--fnt-dot); font-size: 10px; letter-spacing: .08em;
+  padding: 5px 9px; cursor: pointer;
+}
+.tool-btn:active { filter: brightness(.7); }
+.tool-btn.danger { color: #c4816e; }
+#deck-list-body { padding: 4px 0; }
+.deck-row {
+  display: flex; align-items: center; padding: 6px 12px;
+  border-bottom: 1px dotted var(--rule);
+  background: var(--doc);
+  gap: 8px; cursor: pointer;
+}
+.deck-row:nth-child(even) { background: var(--hdr); }
+.deck-row:hover { filter: brightness(.96); }
+.dr-num {
+  font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
+  min-width: 52px; letter-spacing: .06em;
+}
+.dr-en {
+  flex: 1; font-size: 12px; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dr-rung {
+  font-family: var(--fnt-dot); font-size: 10px; color: var(--cyan);
+  min-width: 38px; text-align: right; letter-spacing: .06em;
+}
+.dr-due {
+  font-size: 9px; color: var(--muted); min-width: 52px;
+  text-align: right; letter-spacing: .04em;
+}
+.due-now { color: var(--green); }
+#deck-empty {
+  text-align: center; color: var(--muted); font-family: var(--fnt-dot);
+  font-size: 13px; padding: 40px 20px; letter-spacing: .08em;
+}
+
+/* ── ADD CARD SCREEN ── */
+#add-screen {
+  background: var(--desk); overflow-y: auto;
+}
+.add-form {
+  background: var(--doc); margin: 8px;
+  border: 1px solid var(--rule); padding: 12px;
+}
+.add-title {
+  font-family: var(--fnt-dot); font-size: 14px; color: var(--ink);
+  letter-spacing: .06em; border-bottom: 1px double var(--rule);
+  padding-bottom: 6px; margin-bottom: 10px;
+}
+.field-group { margin-bottom: 10px; }
+.field-group label {
+  display: block; font-family: var(--fnt-dot); font-size: 9px;
+  color: var(--muted); letter-spacing: .14em; margin-bottom: 3px;
+}
+.field-group input, .field-group select, .field-group textarea {
+  width: 100%; background: transparent;
+  border: none; border-bottom: 1px dotted var(--rule);
+  padding: 4px 2px; font-family: var(--fnt-body); font-size: 14px;
+  color: var(--ink); outline: none;
+}
+.field-group textarea { resize: none; height: 60px; font-size: 12px; }
+.field-group select {
+  font-size: 12px; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.paste-hint {
+  font-size: 9px; color: var(--muted); letter-spacing: .06em;
+  margin-bottom: 8px; line-height: 1.5;
+}
+.submit-btn {
+  width: 100%; background: var(--ink); border: none;
+  color: var(--hdr); font-family: var(--fnt-dot); font-size: 16px;
+  letter-spacing: .12em; padding: 10px;
+  cursor: pointer; margin-top: 4px;
+}
+.submit-btn:active { filter: brightness(.7); }
+
+.paste-area-label {
+  font-family: var(--fnt-dot); font-size: 9px; color: var(--muted);
+  letter-spacing: .12em; margin-bottom: 3px; display: block;
+}
+.paste-area { font-size: 11px !important; height: 70px !important; }
+.import-btn {
+  background: var(--cyan); border: none; color: var(--doc);
+  font-family: var(--fnt-dot); font-size: 12px; letter-spacing: .1em;
+  padding: 7px 14px; cursor: pointer; margin-top: 4px; width: 100%;
+}
+
+/* ── SETTINGS / EXPORT SCREEN ── */
+#settings-screen {
+  background: var(--desk); overflow-y: auto;
+}
+.settings-section {
+  background: var(--doc); margin: 8px;
+  border: 1px solid var(--rule); padding: 12px;
+}
+.settings-title {
+  font-family: var(--fnt-dot); font-size: 13px; color: var(--ink);
+  letter-spacing: .06em; border-bottom: 1px dotted var(--rule);
+  padding-bottom: 5px; margin-bottom: 10px;
+}
+.settings-row {
+  display: flex; gap: 8px; margin-bottom: 8px; align-items: center;
+}
+.settings-row label {
+  flex: 1; font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
+  letter-spacing: .1em;
+}
+.settings-btn {
+  background: var(--ink); border: none; color: var(--hdr);
+  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .08em;
+  padding: 6px 10px; cursor: pointer;
+}
+.settings-btn:active { filter: brightness(.7); }
+.settings-btn.danger { color: #c4816e; }
+.settings-btn.primary { background: var(--cyan); color: var(--doc); }
+
+/* ── START BTN ── */
+.post-btn {
+  background: var(--green); border: none; color: var(--doc);
+  font-family: var(--fnt-dot); font-size: 20px; letter-spacing: .12em;
+  padding: 14px 28px; cursor: pointer;
+  border: 2px solid rgba(255,255,255,.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.post-btn:active { filter: brightness(.85); transform: scale(.98); }
+.post-btn:disabled { background: var(--rule); color: var(--muted); cursor: default; }
+
+/* ── SESSION DONE ── */
+#session-done {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; flex: 1; gap: 16px; padding: 24px;
+}
+.done-stamp {
+  font-family: var(--fnt-dot); font-size: 28px; color: var(--green);
+  border: 3px solid var(--green); padding: 12px 24px;
+  transform: rotate(-3deg); letter-spacing: .1em;
+}
+.done-stats {
+  font-family: var(--fnt-dot); font-size: 11px; color: var(--muted);
+  text-align: center; letter-spacing: .08em; line-height: 1.8;
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--hdr);
+  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .1em;
+  padding: 7px 16px; border: 1px solid var(--rule);
+  pointer-events: none; opacity: 0; transition: opacity .3s;
+  z-index: 99; white-space: nowrap;
+}
+#toast.show { opacity: 1; }
+
+/* ── MODAL ── */
+#modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.6); z-index: 50;
+  align-items: center; justify-content: center;
+}
+#modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--doc); border: 1px solid var(--rule);
+  padding: 16px; max-width: 300px; width: 90%;
+  position: relative;
+}
+.modal-title {
+  font-family: var(--fnt-dot); font-size: 14px; color: var(--ink);
+  letter-spacing: .06em; margin-bottom: 10px;
+  border-bottom: 1px dotted var(--rule); padding-bottom: 6px;
+}
+.modal-body {
+  font-size: 12px; color: var(--ink); line-height: 1.6; margin-bottom: 12px;
+}
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.modal-btn {
+  background: var(--ink); border: none; color: var(--hdr);
+  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .08em;
+  padding: 6px 12px; cursor: pointer;
+}
+.modal-btn.danger { background: var(--red); color: var(--hdr); }
+.modal-btn:active { filter: brightness(.75); }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--desk); }
+::-webkit-scrollbar-thumb { background: var(--rule); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="hdr" class="scan">
+    <div class="hdr-top">
+      <div class="emblem">
+        <svg viewBox="0 0 100 100" width="34" height="34" role="img" aria-label="Hammer and sickle">
+          <g fill="#8a2b22">
+            <path d="M72 18 q20 16 11 44 q-4 14 -18 21 l-6 -10 q11 -5 13 -16 q5 -18 -8 -30 z"/>
+            <path d="M58 34 l10 10 -34 34 q-5 5 -11 0 q-5 -5 0 -11 z"/>
+            <rect x="19" y="70" width="42" height="9" rx="2" transform="rotate(-45 40 74)"/>
+            <polygon points="50,8 53,18 64,18 55,24 58,34 50,28 42,34 45,24 36,18 47,18" fill="#8a2b22"/>
+          </g>
+        </svg>
+      </div>
+      <div class="ministry-name">
+        МИНИСТЕРСТВО ЯЗЫКОВОГО ПРОСВЕЩЕНИЯ
+        <div class="ministry-sub">ОТДЕЛ ВОССТАНОВЛЕНИЯ · СЕКЦИЯ ДРЕЛИ</div>
+      </div>
+    </div>
+    <div class="hdr-meta">
+      <div>ДЕЛО № <span id="hdr-caso">----</span></div>
+      <div>ДОПУСК · УРОВЕНЬ <span id="hdr-rung">0</span></div>
+      <div id="hdr-due-count"></div>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" data-screen="drill">СМЕНА</button>
+    <button class="nav-btn" data-screen="deck">КАРТОТЕКА</button>
+    <button class="nav-btn" data-screen="add">ПОДАТЬ</button>
+    <button class="nav-btn" data-screen="settings">ДОСЬЕ</button>
+  </nav>
+
+  <!-- DRILL SCREEN -->
+  <section id="drill-screen" class="screen active">
+    <div id="no-russian-voice">
+      ⚠ ГОЛОС RU-RU НЕ НАЙДЕН — Настройки → Спец. возможности → Речь → Голоса
+    </div>
+
+    <!-- SESSION START -->
+    <div id="session-start">
+      <div class="ss-title">ЗАСТУПИТЬ НА ПОСТ</div>
+      <div class="ss-sub">
+        ОТДЕЛ ВОССТАНОВЛЕНИЯ ЯЗЫКОВОГО ПРОСВЕЩЕНИЯ<br>
+        ГРАЖДАНИН, ВАШИ ДОКУМЕНТЫ
+      </div>
+      <div class="ss-stats">
+        КАРТ К ПОВТОРЕНИЮ: <span id="due-count">…</span><br>
+        ВСЕГО В ДЕЛЕ: <span id="total-count">…</span>
+      </div>
+      <button class="post-btn" id="start-btn" onclick="startSession()">
+        ▶ ЗАСТУПИТЬ НА ПОСТ
+      </button>
+      <div id="no-cards-msg" style="display:none;font-family:var(--fnt-dot);font-size:11px;color:var(--muted);text-align:center;letter-spacing:.08em;">
+        НЕТ КАРТ ДЛЯ ПОВТОРЕНИЯ.<br>СЛЕДУЮЩАЯ СМЕНА СКОРО.
+      </div>
+    </div>
+
+    <!-- DRILL AREA -->
+    <div id="drill-area">
+      <div class="dossier" id="dossier">
+        <div class="dossier-header">
+          <span class="dossier-label" id="card-label">ПРЕДЪЯВИТЬ ПЕРЕВОД ⟶</span>
+          <span class="clearance-badge" id="card-clearance">УРОВЕНЬ 0</span>
+        </div>
+
+        <!-- PROMPT SECTION -->
+        <div class="dossier-section" id="prompt-section">
+          <div class="field-label" id="prompt-field-label">ИСТОЧНИК · АНГЛИЙСКИЙ</div>
+          <div class="field-value" id="prompt-text"></div>
+          <div class="tag-row" id="prompt-tags"></div>
+        </div>
+
+        <!-- AUDIO PROMPT (ru2en only) -->
+        <div class="dossier-section" id="audio-prompt-section" style="display:none;">
+          <button class="audio-btn" id="audio-prompt-btn" onclick="playPromptAudio()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <polygon points="3,2 13,8 3,14" fill="currentColor"/>
+            </svg>
+            ВОСПРОИЗВЕСТИ ЗАПИСЬ
+          </button>
+        </div>
+
+        <!-- GAP SECTION -->
+        <div id="gap-section" style="display:none;">
+          <div class="gap-bar-wrap"><div class="gap-bar" id="gap-bar"></div></div>
+          <div class="gap-label" id="gap-label">6с</div>
+          <div style="text-align:center;padding:4px 12px;">
+            <span style="font-family:var(--fnt-dot);font-size:10px;color:var(--muted);letter-spacing:.08em;">
+              НАЖМИТЕ ДЛЯ ДОСРОЧНОГО РАСКРЫТИЯ
+            </span>
+          </div>
+        </div>
+
+        <!-- ANSWER SECTION -->
+        <div class="dossier-section" id="answer-section" style="display:none;">
+          <div class="field-label">ВЕРНЫЙ ОТВЕТ · ШТАМП ДЕЛА</div>
+          <div class="field-value" id="answer-text"></div>
+          <div class="field-translit" id="answer-translit"></div>
+          <div class="tag-row" id="answer-tags"></div>
+          <button class="audio-btn" id="audio-answer-btn" onclick="playAnswerAudio()" style="margin-top:8px;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <polygon points="3,2 13,8 3,14" fill="currentColor"/>
+            </svg>
+            ВОСПРОИЗВЕСТИ ЗАПИСЬ
+          </button>
+        </div>
+
+        <!-- HIDDEN ANSWER (during gap) -->
+        <div class="dossier-section" id="hidden-answer-section" style="display:none;">
+          <div class="field-label">ОТВЕТ · ЗАСЕКРЕЧЕН</div>
+          <div class="hidden-answer" id="hidden-answer-tap" onclick="skipGap()">
+            ▓▓▓ ▓▓▓▓▓▓▓▓ ▓▓▓▓▓
+          </div>
+        </div>
+
+        <!-- GRADING -->
+        <div class="grade-row" id="grade-row" style="display:none;">
+          <button class="stamp approved" onclick="grade('got')">
+            <div class="stamp-main">ОДОБРЕНО</div>
+            <div class="stamp-sub">+1 СТУПЕНЬ</div>
+          </button>
+          <button class="stamp shaky" onclick="grade('shaky')">
+            <div class="stamp-main">НА ПЕРЕСМОТР</div>
+            <div class="stamp-sub">УДЕРЖАНО</div>
+          </button>
+          <button class="stamp denied" onclick="grade('missed')">
+            <div class="stamp-main">ОТКАЗАНО</div>
+            <div class="stamp-sub">−2 СТУПЕНИ</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- BACKWARD BUILDUP -->
+      <div id="buildup-section" style="display:none;padding:4px 8px 0;">
+        <div class="dossier" style="padding-bottom:8px;">
+          <div class="dossier-header">
+            <span class="dossier-label">ОБРАТНАЯ СБОРКА · PIMSLEUR</span>
+          </div>
+          <div id="buildup-chunks" style="padding:8px 12px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SESSION DONE -->
+    <div id="session-done">
+      <div class="done-stamp">СМЕНА ЗАВЕРШЕНА</div>
+      <div class="done-stats" id="done-stats"></div>
+      <button class="post-btn" onclick="endSession()" style="font-size:14px;padding:10px 20px;">
+        ПОКИНУТЬ ПОСТ
+      </button>
+    </div>
+
+    <!-- SERVICE RECORD -->
+    <div id="service-record">
+      <div>
+        <div class="service-label">СТАЖ</div>
+        <div class="stazh-boxes" id="stazh-boxes"></div>
+      </div>
+      <div class="session-info" id="session-info">СМЕНА 1 · 0 КАРТ</div>
+    </div>
+  </section>
+
+  <!-- DECK LIST SCREEN -->
+  <section id="deck-screen" class="screen">
+    <div class="deck-toolbar">
+      <div class="deck-title">КАРТОТЕКА · РЕЕСТР ДЕЛ</div>
+      <button class="tool-btn" onclick="showScreen('add')">+ ПОДАТЬ</button>
+      <button class="tool-btn danger" id="clear-deck-btn" onclick="confirmClearDeck()">ОЧИСТИТЬ</button>
+    </div>
+    <div id="deck-list-body">
+      <div id="deck-empty">КАРТОТЕКА ПУСТА</div>
+    </div>
+  </section>
+
+  <!-- ADD CARD SCREEN -->
+  <section id="add-screen" class="screen">
+    <div class="add-form">
+      <div class="add-title">ПОДАЧА НОВОЙ КАРТОЧКИ</div>
+
+      <div class="paste-hint">
+        ВСТАВЬТЕ ОДНУ СТРОКУ: Английский | Русский (с ударениями) | транслит<br>
+        ИЛИ ЗАПОЛНИТЕ ПОЛЯ ВРУЧНУЮ
+      </div>
+
+      <div class="field-group">
+        <label class="paste-area-label">ВСТАВИТЬ СТРОКУ</label>
+        <textarea class="paste-area" id="paste-input"
+          placeholder="Hello | Приве́т | Privét"
+          oninput="parsePasteRow(this.value)"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label>АНГЛИЙСКИЙ ТЕКСТ</label>
+        <input type="text" id="add-en" placeholder="English phrase">
+      </div>
+      <div class="field-group">
+        <label>РУССКИЙ (С УДАРЕНИЯМИ U+0301)</label>
+        <input type="text" id="add-ru" placeholder="Ру́сская фра́за">
+      </div>
+      <div class="field-group">
+        <label>ТРАНСЛИТЕРАЦИЯ</label>
+        <input type="text" id="add-translit" placeholder="Rússkaya fráza">
+      </div>
+      <div class="field-group">
+        <label>ПАДЕЖ (НЕОБЯЗАТЕЛЬНО)</label>
+        <input type="text" id="add-case" placeholder="РОД. ПАДЕЖ">
+      </div>
+      <div class="field-group">
+        <label>ВИД ГЛАГОЛА (НЕОБЯЗАТЕЛЬНО)</label>
+        <input type="text" id="add-aspect" placeholder="НЕСОВ. ВИД">
+      </div>
+      <div class="field-group">
+        <label>НАПРАВЛЕНИЕ</label>
+        <select id="add-direction">
+          <option value="en2ru">EN→RU (производство)</option>
+          <option value="ru2en">RU→EN (понимание)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>ПАУЗА (секунды)</label>
+        <input type="number" id="add-gap" value="6" min="2" max="30">
+      </div>
+      <button class="submit-btn" onclick="submitCard()">▶ ПОДАТЬ</button>
+    </div>
+
+    <div class="add-form" style="margin-top:0;">
+      <div class="add-title">ИМПОРТ ПАКЕТА</div>
+      <div class="paste-hint">ЗАГРУЗИТЬ JSON ЭКСПОРТ (КОЛОДА ± АУДИО)</div>
+      <div class="settings-row">
+        <button class="settings-btn primary" onclick="document.getElementById('import-file').click()">
+          ВЫБРАТЬ ФАЙЛ
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importDeck(this)">
+        <button class="settings-btn" onclick="importAudioPack()">ИМПОРТ АУДИО</button>
+        <input type="file" id="import-audio-file" accept=".json" style="display:none" onchange="importAudioPackFile(this)">
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS / EXPORT SCREEN -->
+  <section id="settings-screen" class="screen">
+    <div class="settings-section">
+      <div class="settings-title">ЭКСПОРТ ДАННЫХ</div>
+      <div class="settings-row">
+        <label>ЭКСПОРТ КОЛОДЫ (БЕЗ АУДИО)</label>
+        <button class="settings-btn primary" onclick="exportDeck(false)">СКАЧАТЬ</button>
+      </div>
+      <div class="settings-row">
+        <label>ЭКСПОРТ КОЛОДЫ + АУДИО</label>
+        <button class="settings-btn primary" onclick="exportDeck(true)">СКАЧАТЬ</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">СТАТИСТИКА</div>
+      <div id="stats-body" style="font-family:var(--fnt-dot);font-size:11px;color:var(--muted);line-height:1.8;letter-spacing:.06em;"></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">ОПАСНАЯ ЗОНА</div>
+      <div class="settings-row">
+        <label>СБРОСИТЬ ВСЕ ПРОГРЕССЫ (ОСТАВИТЬ КАРТЫ)</label>
+        <button class="settings-btn danger" onclick="confirmResetProgress()">СБРОС</button>
+      </div>
+      <div class="settings-row">
+        <label>УДАЛИТЬ ВСЕ ДАННЫЕ</label>
+        <button class="settings-btn danger" onclick="confirmNuke()">УНИЧТОЖИТЬ</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">ОБ УСТАНОВКЕ (iOS)</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.7;letter-spacing:.05em;">
+        1. ОТКРОЙТЕ В SAFARI<br>
+        2. НАЖМИТЕ ПОДЕЛИТЬСЯ (□↑)<br>
+        3. «НА ЭКРАН ДОМ»<br>
+        4. ТОЛЬКО SAFARI ПОДДЕРЖИВАЕТ УСТАНОВКУ PWA НА iOS
+      </div>
+    </div>
+  </section>
+
+</div><!-- #app -->
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONSTANTS ──────────────────────────────────────────────
+const DB_NAME = 'russian_drill';
+const DB_VER  = 1;
+const LADDER_MS = [30000,120000,600000,3600000,18000000,
+                   86400000,259200000,604800000,1814400000,5184000000];
+
+// ── STATE ──────────────────────────────────────────────────
+let db = null;
+let sessionQueue   = [];
+let sessionIdx     = 0;
+let currentCard    = null;
+let phase          = 'idle'; // idle | prompt | gap | reveal | grade
+let gapTimer       = null;
+let gapRemaining   = 0;
+let sessionGraded  = 0;
+let sessionCorrect = 0;
+let sessionNum     = 1;
+let audioCtxPrimed = false;
+let audioCtx       = null;
+let currentAudioSrc = null;
+
+// ── DB ─────────────────────────────────────────────────────
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('cards'))
+        d.createObjectStore('cards', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('audio'))
+        d.createObjectStore('audio', { keyPath: 'key' });
+    };
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+function txGet(store, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+function txGetAll(store) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+function txPut(store, obj) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).put(obj);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+function txDelete(store, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(key);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+function txClear(store) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).clear();
+    req.onsuccess = () => res();
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+// ── INIT ───────────────────────────────────────────────────
+async function init() {
+  db = await openDB();
+  // Request persistent storage
+  if (navigator.storage && navigator.storage.persist)
+    navigator.storage.persist();
+
+  // Seed from deck.json if empty
+  const cards = await txGetAll('cards');
+  if (cards.length === 0) {
+    try {
+      const r = await fetch('deck.json');
+      if (r.ok) {
+        const seed = await r.json();
+        const now = Date.now();
+        for (const c of seed) {
+          c.created = now;
+          c.due = 0;
+          await txPut('cards', c);
+        }
+        toast('ЗАГРУЖЕНО ' + seed.length + ' ИСХОДНЫХ КАРТ');
+      }
+    } catch(e) { /* no deck.json available */ }
+  }
+
+  checkRuVoice();
+  await refreshUI();
+  registerSW();
+}
+
+// ── VOICE CHECK ────────────────────────────────────────────
+function checkRuVoice() {
+  const check = () => {
+    const voices = speechSynthesis.getVoices();
+    const hasRu  = voices.some(v => v.lang.startsWith('ru'));
+    document.getElementById('no-russian-voice').style.display =
+      hasRu ? 'none' : 'block';
+  };
+  if (speechSynthesis.onvoiceschanged !== undefined)
+    speechSynthesis.onvoiceschanged = check;
+  check();
+}
+
+// ── REFRESH UI ─────────────────────────────────────────────
+async function refreshUI() {
+  const cards = await txGetAll('cards');
+  const now   = Date.now();
+  const due   = cards.filter(c => c.due <= now);
+
+  document.getElementById('due-count').textContent   = due.length;
+  document.getElementById('total-count').textContent = cards.length;
+  document.getElementById('hdr-due-count').textContent =
+    due.length > 0 ? due.length + ' К ПОВТОРЕНИЮ' : '';
+
+  const startBtn    = document.getElementById('start-btn');
+  const noCardsMsg  = document.getElementById('no-cards-msg');
+  if (due.length === 0) {
+    startBtn.disabled    = true;
+    noCardsMsg.style.display = 'block';
+  } else {
+    startBtn.disabled    = false;
+    noCardsMsg.style.display = 'none';
+  }
+
+  // Update stats screen
+  const byRung = Array(10).fill(0);
+  for (const c of cards) byRung[Math.min(c.rung, 9)]++;
+  let statsHtml = '';
+  const rungNames = ['30с','2м','10м','1ч','5ч','1д','3д','7д','21д','60д'];
+  for (let i = 0; i < 10; i++) {
+    if (byRung[i]) statsHtml +=
+      `СТУПЕНЬ ${i} (${rungNames[i]}): ${byRung[i]} КАРТ<br>`;
+  }
+  if (cards.length === 0) statsHtml = 'КАРТОТЕКА ПУСТА';
+  const sb = document.getElementById('stats-body');
+  if (sb) sb.innerHTML = statsHtml;
+}
+
+// ── SESSION ────────────────────────────────────────────────
+async function startSession() {
+  // Prime audio context (iOS gesture unlock)
+  primeAudio();
+
+  const cards = await txGetAll('cards');
+  const now   = Date.now();
+  sessionQueue   = cards.filter(c => c.due <= now).sort((a,b) => a.due - b.due);
+  sessionIdx     = 0;
+  sessionGraded  = 0;
+  sessionCorrect = 0;
+
+  if (sessionQueue.length === 0) return;
+
+  // Request Wake Lock
+  try {
+    if ('wakeLock' in navigator) {
+      await navigator.wakeLock.request('screen');
+    }
+  } catch(e) { /* not critical */ }
+
+  document.getElementById('session-start').style.display = 'none';
+  document.getElementById('session-done').style.display  = 'none';
+  document.getElementById('drill-area').style.display    = 'flex';
+
+  updateServiceRecord();
+  showCard(sessionQueue[0]);
+}
+
+function primeAudio() {
+  if (audioCtxPrimed) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Play a silent buffer to unlock iOS
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+    audioCtxPrimed = true;
+  } catch(e) {}
+  // Also prime HTML audio
+  const a = document.createElement('audio');
+  a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+  a.play().catch(()=>{});
+}
+
+function showCard(card) {
+  currentCard = card;
+  phase = 'prompt';
+  clearGapTimer();
+
+  document.getElementById('hdr-caso').textContent    = 'ДЕЛО ' + card.id;
+  document.getElementById('hdr-rung').textContent    = card.rung;
+  document.getElementById('card-clearance').textContent = 'УРОВЕНЬ ' + card.rung;
+
+  // Reset sections
+  document.getElementById('gap-section').style.display           = 'none';
+  document.getElementById('answer-section').style.display        = 'none';
+  document.getElementById('hidden-answer-section').style.display = 'none';
+  document.getElementById('grade-row').style.display             = 'none';
+  document.getElementById('buildup-section').style.display       = 'none';
+  document.getElementById('audio-prompt-section').style.display  = 'none';
+
+  const tagsPrompt = document.getElementById('prompt-tags');
+  tagsPrompt.innerHTML = '';
+
+  if (card.direction === 'en2ru') {
+    document.getElementById('card-label').textContent           = 'ПРЕДЪЯВИТЬ ПЕРЕВОД ⟶';
+    document.getElementById('prompt-field-label').textContent   = 'ИСТОЧНИК · АНГЛИЙСКИЙ';
+    document.getElementById('prompt-text').textContent          = card.en;
+    document.getElementById('prompt-section').style.display     = 'block';
+    document.getElementById('audio-prompt-section').style.display = 'none';
+  } else {
+    document.getElementById('card-label').textContent           = 'ПРОСЛУШАТЬ И ПЕРЕВЕСТИ ⟶';
+    document.getElementById('prompt-field-label').textContent   = 'ИСТОЧНИК · РУССКИЙ';
+    document.getElementById('prompt-text').textContent          = '';
+    document.getElementById('prompt-section').style.display     = 'block';
+    document.getElementById('audio-prompt-section').style.display = 'block';
+    // Auto-play prompt for ru2en
+    setTimeout(() => playPromptAudio(), 300);
+  }
+
+  // Show gap after short delay
+  setTimeout(() => beginGap(), card.direction === 'ru2en' ? 800 : 400);
+}
+
+function beginGap() {
+  phase = 'gap';
+  const secs = currentCard.gap_seconds || 6;
+  gapRemaining = secs;
+
+  document.getElementById('gap-section').style.display           = 'block';
+  document.getElementById('hidden-answer-section').style.display = 'block';
+  updateGapBar(secs, secs);
+
+  gapTimer = setInterval(() => {
+    gapRemaining -= 0.1;
+    updateGapBar(Math.max(gapRemaining, 0), secs);
+    if (gapRemaining <= 0) {
+      clearGapTimer();
+      revealAnswer();
+    }
+  }, 100);
+}
+
+function updateGapBar(remaining, total) {
+  const pct = (remaining / total) * 100;
+  document.getElementById('gap-bar').style.width   = pct + '%';
+  document.getElementById('gap-label').textContent = Math.ceil(remaining) + 'С';
+}
+
+function skipGap() {
+  if (phase !== 'gap') return;
+  clearGapTimer();
+  revealAnswer();
+}
+
+function clearGapTimer() {
+  if (gapTimer) { clearInterval(gapTimer); gapTimer = null; }
+}
+
+function revealAnswer() {
+  phase = 'reveal';
+  document.getElementById('gap-section').style.display           = 'none';
+  document.getElementById('hidden-answer-section').style.display = 'none';
+
+  const card = currentCard;
+  document.getElementById('answer-text').textContent    = card.ru;
+  document.getElementById('answer-translit').textContent = card.translit || '';
+
+  // Grammar tags
+  const atags = document.getElementById('answer-tags');
+  atags.innerHTML = '';
+  if (card.case_note)   atags.insertAdjacentHTML('beforeend', `<span class="gram-tag">${card.case_note}</span>`);
+  if (card.aspect_note) atags.insertAdjacentHTML('beforeend', `<span class="gram-tag">${card.aspect_note}</span>`);
+
+  // For ru2en: show English answer
+  if (card.direction === 'ru2en') {
+    document.getElementById('prompt-field-label').textContent = 'ВЕРНЫЙ ОТВЕТ · АНГЛИЙСКИЙ';
+    document.getElementById('prompt-text').textContent = card.en;
+    document.getElementById('answer-section').querySelector('.field-label').textContent = 'РУССКИЙ ОРИГИНАЛ';
+  }
+
+  document.getElementById('answer-section').style.display = 'block';
+  document.getElementById('grade-row').style.display      = 'flex';
+
+  // Backward buildup if chunks present
+  if (card.chunks && card.chunks.length > 0) {
+    renderBuildup(card.chunks);
+  }
+
+  // Auto-play answer audio
+  setTimeout(() => playAnswerAudio(), 200);
+}
+
+function renderBuildup(chunks) {
+  document.getElementById('buildup-section').style.display = 'block';
+  const container = document.getElementById('buildup-chunks');
+  container.innerHTML = '';
+  // Show in reverse order (last chunk first = Pimsleur buildup)
+  const reversed = [...chunks].reverse();
+  reversed.forEach((chunk, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'audio-btn';
+    btn.style.marginTop = i === 0 ? '0' : '4px';
+    btn.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <polygon points="3,2 13,8 3,14" fill="currentColor"/>
+      </svg>
+      ${chunk}`;
+    const c = chunk;
+    btn.onclick = () => speakRussian(stripAccents(c));
+    container.appendChild(btn);
+  });
+  // Play buildup sequence automatically after reveal audio
+  setTimeout(() => playBuildup(reversed, 0), 1200);
+}
+
+async function playBuildup(chunks, idx) {
+  if (idx >= chunks.length) return;
+  await speakRussianAsync(stripAccents(chunks[idx]));
+  setTimeout(() => playBuildup(chunks, idx + 1), 600);
+}
+
+// ── GRADING ────────────────────────────────────────────────
+async function grade(result) {
+  if (phase !== 'reveal') return;
+  const card = currentCard;
+  const now  = Date.now();
+  let rung   = card.rung;
+
+  if (result === 'got') {
+    rung = Math.min(rung + 1, 9);
+    card.due = now + LADDER_MS[rung];
+    sessionCorrect++;
+  } else if (result === 'shaky') {
+    card.due = now + LADDER_MS[rung];
+  } else { // missed
+    rung = Math.max(rung - 2, 0);
+    card.due = now + 30000; // re-show in 30s
+    // Requeue
+    sessionQueue.push({ ...card, rung });
+  }
+
+  card.rung        = rung;
+  card.lastReviewed = now;
+  sessionGraded++;
+
+  await txPut('cards', card);
+  updateServiceRecord();
+
+  // Advance queue
+  sessionIdx++;
+  if (sessionIdx < sessionQueue.length) {
+    showCard(sessionQueue[sessionIdx]);
+  } else {
+    showSessionDone();
+  }
+}
+
+function showSessionDone() {
+  document.getElementById('drill-area').style.display   = 'none';
+  document.getElementById('session-done').style.display = 'flex';
+  document.getElementById('done-stats').innerHTML =
+    `РАССМОТРЕНО: ${sessionGraded} КАРТ<br>` +
+    `ОДОБРЕНО: ${sessionCorrect}<br>` +
+    `ТОЧНОСТЬ: ${sessionGraded > 0 ? Math.round(sessionCorrect/sessionGraded*100) : 0}%<br><br>` +
+    `СМЕНА ${sessionNum} ЗАВЕРШЕНА`;
+
+  // Prompt export after session
+  if (sessionGraded >= 5) {
+    setTimeout(() => toast('РЕКОМЕНДУЕМ ЭКСПОРТ ДАННЫХ → ДОСЬЕ'), 1500);
+  }
+  refreshUI();
+}
+
+function endSession() {
+  sessionNum++;
+  document.getElementById('session-done').style.display  = 'none';
+  document.getElementById('session-start').style.display = 'flex';
+  document.getElementById('hdr-caso').textContent = '----';
+  refreshUI();
+}
+
+function updateServiceRecord() {
+  const total = sessionQueue.length;
+  const done  = sessionIdx;
+  const boxes = document.getElementById('stazh-boxes');
+  const info  = document.getElementById('session-info');
+
+  // 10 boxes representing session progress
+  const slots = 10;
+  let html = '';
+  for (let i = 0; i < slots; i++) {
+    const filled = total > 0 && i < Math.round((done / total) * slots);
+    html += `<div class="stazh-box${filled ? ' filled' : ''}"></div>`;
+  }
+  boxes.innerHTML = html;
+  info.textContent = `СМЕНА ${sessionNum} · ${total} КАРТ`;
+}
+
+// ── AUDIO ──────────────────────────────────────────────────
+async function playAnswerAudio() {
+  if (!currentCard) return;
+  const key = currentCard.id + '_a';
+  const played = await playStoredAudio(key);
+  if (!played) speakRussian(stripAccents(currentCard.ru));
+}
+
+async function playPromptAudio() {
+  if (!currentCard) return;
+  const key = currentCard.id + '_p';
+  const played = await playStoredAudio(key);
+  if (!played) speakRussian(stripAccents(currentCard.ru));
+}
+
+async function playStoredAudio(key) {
+  const row = await txGet('audio', key);
+  if (!row) return false;
+  stopCurrentAudio();
+  const url = URL.createObjectURL(row.blob);
+  const audio = new Audio(url);
+  currentAudioSrc = audio;
+  audio.onended = () => URL.revokeObjectURL(url);
+  try { await audio.play(); return true; } catch(e) { return false; }
+}
+
+function stopCurrentAudio() {
+  if (currentAudioSrc) {
+    currentAudioSrc.pause();
+    currentAudioSrc = null;
+  }
+  speechSynthesis.cancel();
+}
+
+function speakRussian(text) {
+  if (!text) return;
+  speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ru-RU';
+  utt.rate = 0.85;
+  const voices = speechSynthesis.getVoices();
+  const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+  if (ruVoice) utt.voice = ruVoice;
+  speechSynthesis.speak(utt);
+}
+
+function speakRussianAsync(text) {
+  return new Promise(resolve => {
+    if (!text) { resolve(); return; }
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'ru-RU';
+    utt.rate = 0.85;
+    const voices = speechSynthesis.getVoices();
+    const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+    if (ruVoice) utt.voice = ruVoice;
+    utt.onend = resolve;
+    utt.onerror = resolve;
+    speechSynthesis.speak(utt);
+  });
+}
+
+function stripAccents(str) {
+  // Remove combining acute accent U+0301 and ́ HTML entity
+  return str.replace(/́/g, '').replace(/́/g, '');
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.screen === name);
+  });
+  document.getElementById(name + '-screen').classList.add('active');
+
+  if (name === 'deck') renderDeckList();
+  if (name === 'settings') refreshUI();
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => showScreen(btn.dataset.screen));
+});
+
+// ── DECK LIST ──────────────────────────────────────────────
+async function renderDeckList() {
+  const cards = await txGetAll('cards');
+  const body  = document.getElementById('deck-list-body');
+  const empty = document.getElementById('deck-empty');
+
+  if (cards.length === 0) {
+    empty.style.display = 'block';
+    body.querySelectorAll('.deck-row').forEach(r => r.remove());
+    return;
+  }
+  empty.style.display = 'none';
+
+  const sorted = [...cards].sort((a, b) => a.id.localeCompare(b.id));
+  const now    = Date.now();
+
+  // Remove old rows
+  body.querySelectorAll('.deck-row').forEach(r => r.remove());
+
+  for (const c of sorted) {
+    const row  = document.createElement('div');
+    row.className = 'deck-row';
+    const dueStr = c.due <= now
+      ? '<span class="due-now">СЕЙЧАС</span>'
+      : relTime(c.due - now);
+    row.innerHTML =
+      `<span class="dr-num">ДЕЛО ${c.id}</span>` +
+      `<span class="dr-en">${c.en}</span>` +
+      `<span class="dr-rung">УР.${c.rung}</span>` +
+      `<span class="dr-due">${dueStr}</span>`;
+    row.onclick = () => openCardModal(c);
+    body.appendChild(row);
+  }
+}
+
+function relTime(ms) {
+  const s = Math.floor(ms / 1000);
+  if (s < 60)    return s + 'с';
+  if (s < 3600)  return Math.floor(s/60) + 'м';
+  if (s < 86400) return Math.floor(s/3600) + 'ч';
+  return Math.floor(s/86400) + 'д';
+}
+
+function openCardModal(card) {
+  showModal(
+    `ДЕЛО № ${card.id}`,
+    `<b>${card.en}</b><br>${card.ru}<br><i>${card.translit}</i><br><br>` +
+    `Ступень: ${card.rung} · ${card.due <= Date.now() ? 'DUE NOW' : 'next in ' + relTime(card.due - Date.now())}`,
+    [
+      { label: 'УДАЛИТЬ', cls: 'danger', action: () => deleteCard(card.id) },
+      { label: 'ЗАКРЫТЬ', cls: '',       action: closeModal }
+    ]
+  );
+}
+
+async function deleteCard(id) {
+  await txDelete('cards', id);
+  await txDelete('audio', id + '_a');
+  await txDelete('audio', id + '_p');
+  closeModal();
+  renderDeckList();
+  refreshUI();
+  toast('КАРТА УДАЛЕНА');
+}
+
+// ── ADD CARD ───────────────────────────────────────────────
+function parsePasteRow(val) {
+  const parts = val.split('|').map(s => s.trim());
+  if (parts.length >= 1) document.getElementById('add-en').value      = parts[0] || '';
+  if (parts.length >= 2) document.getElementById('add-ru').value      = parts[1] || '';
+  if (parts.length >= 3) document.getElementById('add-translit').value = parts[2] || '';
+}
+
+async function submitCard() {
+  const en      = document.getElementById('add-en').value.trim();
+  const ru      = document.getElementById('add-ru').value.trim();
+  const translit = document.getElementById('add-translit').value.trim();
+  const caseNote  = document.getElementById('add-case').value.trim();
+  const aspectNote = document.getElementById('add-aspect').value.trim();
+  const direction = document.getElementById('add-direction').value;
+  const gap       = parseInt(document.getElementById('add-gap').value) || 6;
+
+  if (!en || !ru) { toast('ПОЛЯ EN И RU ОБЯЗАТЕЛЬНЫ'); return; }
+
+  const id  = await nextId();
+  const now = Date.now();
+  const card = {
+    id, en, ru, translit,
+    case_note: caseNote, aspect_note: aspectNote,
+    direction, gap_seconds: gap,
+    chunks: [], rung: 0, due: 0,
+    created: now, lastReviewed: 0
+  };
+  await txPut('cards', card);
+
+  // Clear fields
+  ['add-en','add-ru','add-translit','add-case','add-aspect','paste-input']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('add-gap').value = '6';
+
+  toast('КАРТА ПОДАНА: ' + id);
+  refreshUI();
+}
+
+async function nextId() {
+  const cards = await txGetAll('cards');
+  if (cards.length === 0) return '0001';
+  const maxNum = cards.reduce((m, c) => {
+    const n = parseInt(c.id, 10);
+    return isNaN(n) ? m : Math.max(m, n);
+  }, 0);
+  return String(maxNum + 1).padStart(4, '0');
+}
+
+// ── IMPORT / EXPORT ────────────────────────────────────────
+async function exportDeck(withAudio) {
+  const cards = await txGetAll('cards');
+  const data  = {
+    version: 1,
+    exported_at: new Date().toISOString(),
+    cards,
+    audio: {}
+  };
+
+  if (withAudio) {
+    const audioRows = await txGetAll('audio');
+    for (const row of audioRows) {
+      const b64 = await blobToBase64(row.blob);
+      data.audio[row.key] = b64;
+    }
+  }
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `russian_drill_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('ЭКСПОРТ ЗАВЕРШЁН');
+}
+
+function importDeck(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      let imported = 0;
+      if (Array.isArray(data)) {
+        // bare array
+        for (const c of data) { await txPut('cards', c); imported++; }
+      } else if (data.cards) {
+        for (const c of data.cards) { await txPut('cards', c); imported++; }
+        if (data.audio) {
+          for (const [key, b64] of Object.entries(data.audio)) {
+            const blob = await base64ToBlob(b64);
+            await txPut('audio', { key, blob });
+          }
+        }
+      }
+      toast(`ИМПОРТИРОВАНО ${imported} КАРТ`);
+      await refreshUI();
+      renderDeckList();
+    } catch(err) {
+      toast('ОШИБКА ИМПОРТА');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function importAudioPack() {
+  document.getElementById('import-audio-file').click();
+}
+
+function importAudioPackFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const pack = JSON.parse(e.target.result);
+      let count = 0;
+      for (const [key, b64] of Object.entries(pack)) {
+        const blob = await base64ToBlob(b64, 'audio/mpeg');
+        await txPut('audio', { key, blob });
+        count++;
+      }
+      toast(`ИМПОРТИРОВАНО ${count} АУДИОКЛИПОВ`);
+    } catch(err) {
+      toast('ОШИБКА ИМПОРТА АУДИО');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function blobToBase64(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+function base64ToBlob(b64, mime = 'audio/mpeg') {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+// ── DANGER ZONE ────────────────────────────────────────────
+function confirmClearDeck() {
+  showModal(
+    'ОЧИСТИТЬ КАРТОТЕКУ?',
+    'Все карты и прогресс будут удалены безвозвратно.',
+    [
+      { label: 'УНИЧТОЖИТЬ', cls: 'danger', action: clearDeck },
+      { label: 'ОТМЕНА',     cls: '',       action: closeModal }
+    ]
+  );
+}
+
+async function clearDeck() {
+  await txClear('cards');
+  await txClear('audio');
+  closeModal();
+  renderDeckList();
+  refreshUI();
+  toast('КАРТОТЕКА ОЧИЩЕНА');
+}
+
+function confirmResetProgress() {
+  showModal(
+    'СБРОСИТЬ ПРОГРЕСС?',
+    'Все ступени будут обнулены. Карты сохранятся.',
+    [
+      { label: 'СБРОСИТЬ', cls: 'danger', action: resetProgress },
+      { label: 'ОТМЕНА',   cls: '',       action: closeModal }
+    ]
+  );
+}
+
+async function resetProgress() {
+  const cards = await txGetAll('cards');
+  for (const c of cards) {
+    c.rung = 0; c.due = 0; c.lastReviewed = 0;
+    await txPut('cards', c);
+  }
+  closeModal();
+  refreshUI();
+  toast('ПРОГРЕСС СБРОШЕН');
+}
+
+function confirmNuke() {
+  showModal(
+    'УДАЛИТЬ ВСЁ?',
+    'База данных будет полностью уничтожена. Экспортируйте данные перед этим!',
+    [
+      { label: 'УНИЧТОЖИТЬ ВСЁ', cls: 'danger', action: nukeAll },
+      { label: 'ОТМЕНА',          cls: '',        action: closeModal }
+    ]
+  );
+}
+
+async function nukeAll() {
+  await txClear('cards');
+  await txClear('audio');
+  closeModal();
+  refreshUI();
+  toast('ДАННЫЕ УНИЧТОЖЕНЫ');
+}
+
+// ── MODAL ──────────────────────────────────────────────────
+function showModal(title, body, actions) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML    = body;
+  const actDiv = document.getElementById('modal-actions');
+  actDiv.innerHTML = '';
+  for (const a of actions) {
+    const btn = document.createElement('button');
+    btn.className = 'modal-btn ' + (a.cls || '');
+    btn.textContent = a.label;
+    btn.onclick = a.action;
+    actDiv.appendChild(btn);
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// ── TOAST ──────────────────────────────────────────────────
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── SERVICE WORKER ─────────────────────────────────────────
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+}
+
+// ── BOOT ───────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

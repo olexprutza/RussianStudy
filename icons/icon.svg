@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#2b2e28"/>
+  <rect x="25.6" y="25.6" width="460.8" height="460.8" fill="none" stroke="#6e6a55" stroke-width="10.24"/>
+  <g transform="translate(256,256) scale(3.9384615384615387)">
+    <g fill="#8a2b22" transform="translate(-50,-50)">
+      <path d="M72 18 q20 16 11 44 q-4 14 -18 21 l-6 -10 q11 -5 13 -16 q5 -18 -8 -30 z"/>
+      <path d="M58 34 l10 10 -34 34 q-5 5 -11 0 q-5 -5 0 -11 z"/>
+      <rect x="19" y="70" width="42" height="9" rx="2" transform="rotate(-45 40 74)"/>
+      <polygon points="50,8 53,18 64,18 55,24 58,34 50,28 42,34 45,24 36,18 47,18"/>
+    </g>
+  </g>
+  <text x="256" y="450.56" font-family="monospace" font-size="46.08" fill="#7a6f4e" text-anchor="middle" letter-spacing="2">МЯ</text>
+</svg>
