@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 /**
- * gen_icons.mjs — Generates PWA icons as SVG + PNG placeholder
+ * gen_icons.mjs — Generates PWA icons (Soviet poster style)
  *
- * Run: node gen_icons.mjs
- * Outputs: icons/icon-192.png, icons/icon-512.png
- *
- * Requires: npm install sharp  (or use the SVG icon directly)
+ * Run: node gen_icons.mjs        (requires: npm install sharp)
+ * Outputs: icons/icon.svg, icons/icon-192.png, icons/icon-512.png
  */
 
 import { writeFileSync, mkdirSync } from 'fs';
@@ -16,26 +14,27 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const iconDir = join(__dir, 'icons');
 mkdirSync(iconDir, { recursive: true });
 
-// SVG icon: hammer & sickle on olive desk background
-const svgIcon = (size) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-  <rect width="${size}" height="${size}" fill="#2b2e28"/>
-  <rect x="${size*0.05}" y="${size*0.05}" width="${size*0.9}" height="${size*0.9}" fill="none" stroke="#6e6a55" stroke-width="${size*0.02}"/>
-  <g transform="translate(${size/2},${size/2}) scale(${size/130})">
-    <g fill="#8a2b22" transform="translate(-50,-50)">
-      <path d="M72 18 q20 16 11 44 q-4 14 -18 21 l-6 -10 q11 -5 13 -16 q5 -18 -8 -30 z"/>
-      <path d="M58 34 l10 10 -34 34 q-5 5 -11 0 q-5 -5 0 -11 z"/>
-      <rect x="19" y="70" width="42" height="9" rx="2" transform="rotate(-45 40 74)"/>
-      <polygon points="50,8 53,18 64,18 55,24 58,34 50,28 42,34 45,24 36,18 47,18"/>
-    </g>
+// Red field, gold-bordered star, cream hammer & sickle — flat vector
+const svgIcon = (size) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${size}" height="${size}">
+  <rect width="100" height="100" fill="#C1121F"/>
+  <rect x="4" y="4" width="92" height="92" fill="none" stroke="#C8A24B" stroke-width="2"/>
+  <polygon fill="none" stroke="#C8A24B" stroke-width="1.6"
+    points="50,13 56.6,32 76.6,32.4 60.7,44.4 66.4,63.7 50,52.2 33.6,63.7 39.3,44.4 23.4,32.4 43.4,32"/>
+  <g fill="#EFE6D0" transform="translate(50 56) scale(.52) translate(-48 -48)">
+    <path fill-rule="evenodd" d="M46 12a36 36 0 1 0 .02 0zM56 20a30 30 0 1 1-.02 0z"
+          transform="rotate(20 48 48)"/>
+    <rect x="66" y="60" width="9" height="26" rx="1.5" transform="rotate(-45 70 73)"/>
+    <rect x="16" y="62" width="52" height="8" rx="1.5" transform="rotate(-45 42 66)"/>
+    <path d="M56 12l16 16-9 9-16-16z"/>
+    <rect x="66" y="6" width="14" height="22" rx="1.5" transform="rotate(45 73 17)"/>
   </g>
-  <text x="${size/2}" y="${size*0.88}" font-family="monospace" font-size="${size*0.09}" fill="#7a6f4e" text-anchor="middle" letter-spacing="2">МЯ</text>
+  <text x="50" y="93" font-family="Arial Narrow, sans-serif" font-weight="bold"
+        font-size="9" fill="#EFE6D0" text-anchor="middle" letter-spacing="3">ДРЕЛЬ</text>
 </svg>`;
 
-// Write SVG files
 writeFileSync(join(iconDir, 'icon.svg'), svgIcon(512), 'utf8');
 console.log('Wrote icons/icon.svg');
 
-// Try to generate PNG with sharp
 try {
   const { default: sharp } = await import('sharp');
   for (const size of [192, 512]) {
@@ -44,15 +43,6 @@ try {
       .toFile(join(iconDir, `icon-${size}.png`));
     console.log(`Wrote icons/icon-${size}.png`);
   }
-} catch(e) {
-  console.log('sharp not installed — writing SVG fallback PNGs (install sharp for real PNGs)');
-  // Write minimal 1x1 placeholder PNGs so the manifest doesn't 404
-  // (real icons need sharp or another PNG renderer)
-  const placeholder = Buffer.from(
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-    'base64'
-  );
-  writeFileSync(join(iconDir, 'icon-192.png'), placeholder);
-  writeFileSync(join(iconDir, 'icon-512.png'), placeholder);
-  console.log('Wrote placeholder PNGs. Run: npm install sharp && node gen_icons.mjs for real icons.');
+} catch (e) {
+  console.log('sharp not installed — run: npm install sharp && node gen_icons.mjs');
 }

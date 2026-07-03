@@ -1,155 +1,146 @@
 #!/usr/bin/env node
-/**
- * gen_audio.mjs — Offline audio generation script
- *
- * Usage:
- *   node gen_audio.mjs --key YOUR_GOOGLE_TTS_KEY [--deck deck.json] [--out audio_pack.json]
- *
- * Reads deck.json, synthesizes each Russian phrase via Google Cloud TTS,
- * and outputs an audio pack JSON: { key: base64_mp3 }
- *
- * The app imports this pack via the "ИМПОРТ АУДИО" button.
- *
- * Google Cloud TTS free tier: 1 million chars/month (WaveNet: 1M chars free)
- * Sign up: https://cloud.google.com/text-to-speech
- */
+// gen_audio.mjs — offline audio pack generator for russian_drill
+//
+// Pluggable provider architecture. Default provider is Google Chirp 3: HD.
+// Synthesis happens HERE, once — the app only plays cached blobs at review time.
+//
+// Usage:
+//   GOOGLE_TTS_API_KEY=... node gen_audio.mjs [--deck deck.json] [--out audio_pack.json]
+//                          [--provider google-chirp3hd] [--voice ru-RU-Chirp3-HD-<Name>]
+//   node gen_audio.mjs --list-voices          # enumerate live ru-RU voices for the provider
+//
+// Output pack format (unchanged): { "<key>": "<base64 audio>" , ... }
+//   keys: <id>_a (answer ru), <id>_p (prompt ru, ru2en cards), <id>_c<i> (chunks)
+// Import into the app via ПОДАТЬ → ИМПОРТ АУДИО.
+//
+// The API key is read from the environment only. Never commit it or ship it
+// in the deployed bundle.
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, writeFileSync } from 'node:fs';
 
-const __dir = dirname(fileURLToPath(import.meta.url));
-
-// ── Parse args ─────────────────────────────────────────────
+// ── CLI ────────────────────────────────────────────────────
 const args = process.argv.slice(2);
-function getArg(flag, def) {
-  const i = args.indexOf(flag);
-  return i !== -1 ? args[i + 1] : def;
+function flag(name, dflt) {
+  const i = args.indexOf('--' + name);
+  return i >= 0 ? args[i + 1] : dflt;
 }
+const LIST_VOICES = args.includes('--list-voices');
+const DECK_PATH   = flag('deck', 'deck.json');
+const OUT_PATH    = flag('out', 'audio_pack.json');
+const PROVIDER_ID = flag('provider', 'google-chirp3hd');
+const VOICE       = flag('voice', null);   // null → auto-pick first matching voice
+const LANG        = 'ru-RU';
 
-const API_KEY   = getArg('--key', process.env.GOOGLE_TTS_KEY || '');
-const DECK_FILE = getArg('--deck', join(__dir, 'deck.json'));
-const OUT_FILE  = getArg('--out',  join(__dir, 'audio_pack.json'));
-const VOICE     = getArg('--voice', 'ru-RU-Neural2-A'); // or ru-RU-Chirp3-HD-Aoede
-const RATE      = parseFloat(getArg('--rate', '0.85')); // speaking rate
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const stripAccents = s => s.replace(/́/g, '');
 
-if (!API_KEY) {
-  console.error('ERROR: No Google TTS API key. Pass --key KEY or set GOOGLE_TTS_KEY env var.');
-  console.error('Get a key: https://console.cloud.google.com/apis/credentials');
-  process.exit(1);
-}
+// ── PROVIDER INTERFACE ─────────────────────────────────────
+// Provider = {
+//   id, label,
+//   listVoices(langCode) -> [{ name, gender }],
+//   synth(text, { voice, format }) -> Buffer   (one utterance)
+// }
 
-if (!existsSync(DECK_FILE)) {
-  console.error('ERROR: deck.json not found at', DECK_FILE);
-  process.exit(1);
-}
-
-const deck = JSON.parse(readFileSync(DECK_FILE, 'utf8'));
-console.log(`Loaded ${deck.length} cards from ${DECK_FILE}`);
-
-// ── Strip combining acute accents before TTS ───────────────
-function stripAccents(str) {
-  // Remove U+0301 combining acute accent
-  return str.replace(/́/g, '').normalize('NFC');
-}
-
-// ── Google Cloud TTS request ───────────────────────────────
-async function synthesize(text, key) {
-  const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${key}`;
-  const body = {
-    input:  { text },
-    voice:  { languageCode: 'ru-RU', name: VOICE },
-    audioConfig: {
-      audioEncoding:   'MP3',
-      speakingRate:    RATE,
-      effectsProfileId: ['handset-class-device'],
+function googleProvider(id, label, nameFilter) {
+  const key = () => {
+    const k = process.env.GOOGLE_TTS_API_KEY || process.env.GOOGLE_TTS_KEY;
+    if (!k) { console.error('Set GOOGLE_TTS_API_KEY in the environment.'); process.exit(1); }
+    return k;
+  };
+  return {
+    id, label,
+    async listVoices(langCode = LANG) {
+      const r = await fetch(
+        `https://texttospeech.googleapis.com/v1/voices?languageCode=${langCode}&key=${key()}`);
+      if (!r.ok) throw new Error(`voices ${r.status}: ${await r.text()}`);
+      const { voices = [] } = await r.json();
+      return voices
+        .filter(v => nameFilter(v.name))
+        .map(v => ({ name: v.name, gender: v.ssmlGender }));
+    },
+    async synth(text, { voice, format = 'MP3' } = {}) {
+      // Chirp 3 HD: plain text only (no SSML), speakingRate/pitch not honored.
+      // Pacing comes from script wording and the app's own gap timing.
+      const body = {
+        input: { text },
+        voice: { languageCode: LANG, name: voice },
+        audioConfig: { audioEncoding: format }
+      };
+      const r = await fetch(
+        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${key()}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body) });
+      if (!r.ok) throw new Error(`synth ${r.status}: ${await r.text()}`);
+      const { audioContent } = await r.json();
+      return Buffer.from(audioContent, 'base64');
     }
   };
-
-  const res = await fetch(url, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body)
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`TTS API error ${res.status}: ${err}`);
-  }
-
-  const data = await res.json();
-  return data.audioContent; // base64 MP3
 }
 
-// ── Sleep helper for rate-limiting ─────────────────────────
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const stubProvider = (id, label) => ({
+  id, label,
+  async listVoices() { throw new Error(`${label}: not implemented yet`); },
+  async synth()      { throw new Error(`${label}: not implemented yet`); }
+});
 
-// ── Main ───────────────────────────────────────────────────
-async function main() {
-  const pack  = {};
-  let   total = 0;
-  let   done  = 0;
-  let   errors = 0;
+const PROVIDERS = {
+  'google-chirp3hd': googleProvider('google-chirp3hd', 'Google Chirp 3: HD',
+                                    n => n.includes('Chirp3-HD')),
+  'google-wavenet':  googleProvider('google-wavenet', 'Google WaveNet/Neural2',
+                                    n => /Wavenet|Neural2/.test(n)),
+  'azure': stubProvider('azure', 'Azure Speech'),
+  'polly': stubProvider('polly', 'Amazon Polly'),
+  // 'stored': user-supplied clips (Tatoeba/Forvo/tutor recordings) are imported
+  // directly through the app's ИМПОРТ АУДИО, keyed by card id — nothing to do here.
+};
 
-  // Count total clips to synthesize
-  for (const card of deck) {
-    total++; // _a clip (answer)
-    if (card.direction === 'ru2en') total++; // _p clip (prompt)
-    if (card.chunks) total += card.chunks.length;
-  }
-  console.log(`Synthesizing ${total} audio clips...`);
+// ── MAIN ───────────────────────────────────────────────────
+const provider = PROVIDERS[PROVIDER_ID];
+if (!provider) {
+  console.error(`Unknown provider "${PROVIDER_ID}". Available: ${Object.keys(PROVIDERS).join(', ')}`);
+  process.exit(1);
+}
 
-  for (const card of deck) {
-    const ruClean = stripAccents(card.ru);
+if (LIST_VOICES) {
+  const voices = await provider.listVoices(LANG);
+  console.log(`${provider.label} — ${LANG} voices:`);
+  for (const v of voices) console.log(`  ${v.name}  (${v.gender})`);
+  process.exit(0);
+}
 
-    // Answer clip (always)
+let voice = VOICE;
+if (!voice) {
+  const voices = await provider.listVoices(LANG);
+  if (!voices.length) { console.error('No voices available for ' + provider.label); process.exit(1); }
+  voice = voices[0].name;
+  console.log(`No --voice given; using ${voice}`);
+}
+
+const deckRaw = JSON.parse(readFileSync(DECK_PATH, 'utf8'));
+const cards = Array.isArray(deckRaw) ? deckRaw : deckRaw.cards;
+const pack = {};
+let n = 0;
+
+for (const card of cards) {
+  const jobs = [];
+  jobs.push([`${card.id}_a`, stripAccents(card.ru)]);
+  if (card.direction === 'ru2en') jobs.push([`${card.id}_p`, stripAccents(card.ru)]);
+  (card.chunks || []).forEach((c, i) => jobs.push([`${card.id}_c${i}`, stripAccents(c)]));
+
+  for (const [key, text] of jobs) {
+    process.stdout.write(`  ${key}  «${text}» ... `);
     try {
-      process.stdout.write(`  [${card.id}] answer... `);
-      pack[card.id + '_a'] = await synthesize(ruClean, API_KEY);
-      done++;
-      console.log('OK');
-    } catch(e) {
-      errors++;
-      console.error('FAILED:', e.message);
+      const buf = await provider.synth(text, { voice });
+      pack[key] = buf.toString('base64');
+      n++;
+      console.log(`${(buf.length / 1024).toFixed(1)} KB`);
+    } catch (e) {
+      console.log('FAILED: ' + e.message);
     }
-    await sleep(110); // ~9 req/s to stay under quota
-
-    // Prompt clip (ru2en cards only — separate clip for the Russian prompt)
-    if (card.direction === 'ru2en') {
-      try {
-        process.stdout.write(`  [${card.id}] prompt... `);
-        pack[card.id + '_p'] = await synthesize(ruClean, API_KEY);
-        done++;
-        console.log('OK');
-      } catch(e) {
-        errors++;
-        console.error('FAILED:', e.message);
-      }
-      await sleep(110);
-    }
-
-    // Chunk clips for backward buildup
-    if (card.chunks && card.chunks.length > 0) {
-      for (let i = 0; i < card.chunks.length; i++) {
-        const chunkClean = stripAccents(card.chunks[i]);
-        try {
-          process.stdout.write(`  [${card.id}] chunk${i}... `);
-          pack[card.id + '_c' + i] = await synthesize(chunkClean, API_KEY);
-          done++;
-          console.log('OK');
-        } catch(e) {
-          errors++;
-          console.error('FAILED:', e.message);
-        }
-        await sleep(110);
-      }
-    }
+    await sleep(110); // stay under ~9 req/s
   }
-
-  writeFileSync(OUT_FILE, JSON.stringify(pack), 'utf8');
-  console.log(`\nDone: ${done}/${total} clips synthesized, ${errors} errors.`);
-  console.log(`Audio pack written to ${OUT_FILE}`);
-  console.log('\nImport into the app: ДОСЬЕ → ИМПОРТ АУДИО → select', OUT_FILE);
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+writeFileSync(OUT_PATH, JSON.stringify(pack));
+console.log(`\nWrote ${n} clips → ${OUT_PATH}`);
+console.log('Import in the app: ПОДАТЬ → ИМПОРТ АУДИО');

@@ -6,519 +6,571 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="РУС.ДРЕЛЬ">
-<meta name="theme-color" content="#2b2e28">
-<title>МИНИСТЕРСТВО ЯЗЫКА</title>
+<meta name="theme-color" content="#C1121F">
+<title>МИНИСТЕРСТВО ЯЗЫКОВОГО ПРОСВЕЩЕНИЯ</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
-/* ── FONTS ── */
+/* ── FONTS (self-hosted, Cyrillic + Latin subsets) ── */
 @font-face {
-  font-family: 'Handjet';
-  src: url('fonts/Handjet-Regular.woff2') format('woff2');
-  font-weight: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'IBMPlexMono';
-  src: url('fonts/IBMPlexMono-Regular.woff2') format('woff2');
+  font-family: 'Stalinist One';
+  src: url('fonts/StalinistOne-cyr.woff2') format('woff2');
   font-weight: 400; font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 @font-face {
-  font-family: 'IBMPlexMono';
-  src: url('fonts/IBMPlexMono-Bold.woff2') format('woff2');
+  font-family: 'PT Sans Narrow';
+  src: url('fonts/PTSansNarrow-Bold-cyr.woff2') format('woff2');
   font-weight: 700; font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'PT Sans Narrow';
+  src: url('fonts/PTSansNarrow-Bold-lat.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F;
+}
+@font-face {
+  font-family: 'PT Sans';
+  src: url('fonts/PTSans-Regular-cyr.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'PT Sans';
+  src: url('fonts/PTSans-Regular-lat.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F;
+}
+@font-face {
+  font-family: 'PT Sans';
+  src: url('fonts/PTSans-Bold-cyr.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'PT Sans';
+  src: url('fonts/PTSans-Bold-lat.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F;
+}
+@font-face {
+  font-family: 'PT Sans';
+  src: url('fonts/PTSans-Italic-lat.woff2') format('woff2');
+  font-weight: 400; font-style: italic; font-display: swap;
+  unicode-range: U+0000-00FF, U+2000-206F;
 }
 
 /* ── RESET & ROOT ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --desk:    #2b2e28;
-  --hdr:     #c9bf9f;
-  --doc:     #d8cfb2;
-  --ink:     #23241d;
-  --red:     #8a2b22;
-  --green:   #5b6b39;
-  --amber:   #9a7b2e;
-  --cyan:    #386f6a;
-  --rule:    #6e6a55;
-  --muted:   #7a6f4e;
-  --fnt-dot: 'Handjet', 'Pixelify Sans', monospace;
-  --fnt-body:'IBMPlexMono', 'Courier New', monospace;
+  /* Fixed Soviet poster palette — the app owns its theme, no OS dark/light */
+  --red:   #C1121F;
+  --ink:   #1A1A1A;
+  --cream: #EFE6D0;
+  --gold:  #C8A24B;
+  --gray:  #8A8172;
+  --fnt-mast: 'Stalinist One', 'PT Sans Narrow', sans-serif;
+  --fnt-cond: 'PT Sans Narrow', 'Arial Narrow', sans-serif;
+  --fnt-body: 'PT Sans', 'Helvetica Neue', sans-serif;
 }
 html, body {
   height: 100%; width: 100%; overflow: hidden;
-  background: var(--desk);
+  background: var(--ink);
   font-family: var(--fnt-body);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── SCANLINE GRAIN ── */
-.scan::after {
-  content: '';
-  position: absolute; inset: 0; pointer-events: none;
-  background-image: repeating-linear-gradient(
-    0deg, rgba(0,0,0,.05) 0, rgba(0,0,0,.05) 1px,
-    transparent 1px, transparent 3px);
-  z-index: 1;
+/* ── PRINT TEXTURE (halftone + newsprint grain, not CRT) ── */
+.halftone {
+  background-image: radial-gradient(rgba(26,26,26,.07) 1px, transparent 1.4px);
+  background-size: 5px 5px;
 }
+.grain::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background-image:
+    radial-gradient(rgba(26,26,26,.04) 0.5px, transparent 1px),
+    radial-gradient(rgba(138,129,114,.05) 0.5px, transparent 1px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 2px 3px;
+}
+/* offset-print channel misregistration for headline elements */
+.misreg { text-shadow: 1.5px 1px 0 rgba(200,162,75,.4); }
 
 /* ── LAYOUT ── */
 #app {
   display: flex; flex-direction: column;
   height: 100%; max-width: 520px; margin: 0 auto;
   position: relative; overflow: hidden;
+  background: var(--cream);
 }
 
-/* ── HEADER ── */
+/* ── MASTHEAD: red bar, cream Cyrillic caps ── */
 #hdr {
-  background: var(--hdr);
-  border-bottom: 2px double var(--rule);
-  padding: 8px 12px 6px;
+  background: var(--red);
+  padding: 10px 14px 8px;
   flex-shrink: 0;
   position: relative;
+  border-bottom: 4px solid var(--ink);
 }
-.hdr-top {
-  display: flex; align-items: center; gap: 8px;
-}
+.hdr-top { display: flex; align-items: center; gap: 10px; }
 .emblem svg { flex-shrink: 0; display: block; }
 .ministry-name {
   flex: 1;
-  font-family: var(--fnt-dot);
-  font-size: 15px;
-  line-height: 1.15;
-  color: var(--ink);
-  letter-spacing: .03em;
+  font-family: var(--fnt-mast);
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--cream);
+  letter-spacing: .02em;
 }
 .ministry-sub {
-  font-family: var(--fnt-body);
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: .12em;
-  margin-top: 1px;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: .22em;
+  margin-top: 3px;
+  text-transform: uppercase;
 }
 .hdr-meta {
-  display: flex; gap: 12px; margin-top: 5px;
-  font-size: 9px; color: var(--muted); letter-spacing: .1em;
+  display: flex; gap: 14px; margin-top: 7px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(239,230,208,.35);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 10px; color: var(--cream); letter-spacing: .14em;
 }
-.hdr-meta span { font-family: var(--fnt-dot); font-size: 11px; }
+.hdr-meta span { color: var(--gold); }
 
-/* ── NAV TABS ── */
+/* ── NAV: black band, condensed caps ── */
 #nav {
   display: flex;
   background: var(--ink);
-  border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
 }
 .nav-btn {
-  flex: 1; padding: 6px 4px; border: none; cursor: pointer;
+  flex: 1; padding: 9px 4px; border: none; cursor: pointer;
   background: transparent;
-  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .06em;
-  color: var(--muted);
-  border-right: 1px solid var(--rule);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 13px; letter-spacing: .12em;
+  color: var(--gray);
+  border-right: 1px solid #333;
   transition: background .15s, color .15s;
 }
 .nav-btn:last-child { border-right: none; }
-.nav-btn.active { background: var(--hdr); color: var(--ink); }
-.nav-btn:not(.active):hover { background: #3a3d37; color: var(--hdr); }
+.nav-btn.active { background: var(--cream); color: var(--red); }
+.nav-btn:not(.active):hover { color: var(--cream); }
 
 /* ── SCREENS ── */
 .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
 .screen.active { display: flex; }
+#drill-screen, #deck-screen, #add-screen, #settings-screen { background: var(--cream); }
+#deck-screen, #add-screen, #settings-screen { overflow-y: auto; }
 
-/* ── DRILL SCREEN ── */
-#drill-screen { background: var(--desk); }
-
+/* ── LESSON START — poster composition ── */
 #session-start {
   display: flex; flex-direction: column; align-items: center;
-  justify-content: center; flex: 1; gap: 20px; padding: 24px;
+  justify-content: center; flex: 1; gap: 22px; padding: 24px;
+  position: relative;
 }
+#session-start::before { /* rising-sun ray burst behind the star */
+  content: '';
+  position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+  width: 340px; height: 340px; pointer-events: none;
+  background: repeating-conic-gradient(from -90deg,
+    rgba(193,18,31,.06) 0deg 9deg, transparent 9deg 18deg);
+  border-radius: 50%;
+}
+.ss-star svg { display: block; }
 .ss-title {
-  font-family: var(--fnt-dot); font-size: 22px; color: var(--hdr);
-  text-align: center; letter-spacing: .05em;
+  font-family: var(--fnt-mast); font-size: 20px; color: var(--red);
+  text-align: center; letter-spacing: .02em; line-height: 1.4;
 }
 .ss-sub {
-  font-size: 11px; color: var(--muted); text-align: center;
-  letter-spacing: .1em; line-height: 1.6;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; color: var(--gray); text-align: center;
+  letter-spacing: .18em; line-height: 1.7; text-transform: uppercase;
 }
 .ss-stats {
-  background: var(--ink); border: 1px solid var(--rule);
-  padding: 10px 20px; font-size: 10px; color: var(--muted);
-  letter-spacing: .1em; text-align: center; font-family: var(--fnt-dot);
+  border-top: 3px solid var(--ink); border-bottom: 3px solid var(--ink);
+  padding: 10px 26px; text-align: center;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; color: var(--ink); letter-spacing: .14em;
 }
-.ss-stats span { color: var(--hdr); font-size: 14px; }
+.ss-stats span { color: var(--red); font-size: 17px; }
 
 #no-russian-voice {
   display: none;
-  background: #3a1a10; border: 1px solid var(--red);
-  padding: 8px 12px; font-size: 10px; color: #c4816e;
-  text-align: center; letter-spacing: .06em; line-height: 1.5;
+  background: var(--ink); border-left: 6px solid var(--red);
+  padding: 8px 12px; font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; color: var(--cream);
+  letter-spacing: .08em; line-height: 1.5;
 }
 
+/* ── START BUTTON ── */
+.post-btn {
+  background: var(--red); border: none; color: var(--cream);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 19px; letter-spacing: .18em;
+  padding: 15px 30px; cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink);
+  text-transform: uppercase;
+}
+.post-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--ink); }
+.post-btn:disabled { background: var(--gray); cursor: default; }
+
+/* ── DRILL AREA — official bulletin ── */
 #drill-area {
   display: none; flex-direction: column; flex: 1; overflow-y: auto;
   padding: 0 0 8px;
 }
-
-/* DOSSIER CARD */
-.dossier {
-  background: var(--doc); margin: 8px; border: 1px solid var(--rule);
-  position: relative; overflow: hidden; padding-bottom: 8px;
+.bulletin {
+  background: var(--cream); margin: 10px;
+  border: 2px solid var(--ink);
+  position: relative;
 }
-.dossier::after {
-  content: '';
-  position: absolute; inset: 0; pointer-events: none;
-  background-image: repeating-linear-gradient(
-    0deg, rgba(0,0,0,.04) 0, rgba(0,0,0,.04) 1px,
-    transparent 1px, transparent 3px);
-}
-.dossier-header {
-  background: var(--hdr); border-bottom: 1px solid var(--rule);
-  padding: 5px 10px;
+.bulletin-header {
+  background: var(--ink);
+  padding: 6px 12px;
   display: flex; justify-content: space-between; align-items: center;
 }
-.dossier-label {
-  font-family: var(--fnt-dot); font-size: 10px; letter-spacing: .1em;
-  color: var(--muted);
+.bulletin-label {
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; letter-spacing: .16em;
+  color: var(--cream); text-transform: uppercase;
 }
 .clearance-badge {
-  font-family: var(--fnt-dot); font-size: 10px;
-  color: var(--cyan); letter-spacing: .08em;
+  font-family: var(--fnt-cond); font-weight: 700; font-size: 11px;
+  color: var(--gold); letter-spacing: .12em;
 }
-.dossier-section {
-  padding: 8px 12px 4px;
-  border-bottom: 1px dotted var(--rule);
+.bulletin-rule {
+  height: 0; border-top: 2px solid var(--red);
+  margin: 0 12px;
+  transform: rotate(-.6deg); /* poster diagonal */
 }
-.dossier-section:last-child { border-bottom: none; }
+.bulletin-section { padding: 12px 14px 8px; }
 .field-label {
-  font-size: 9px; color: var(--muted); letter-spacing: .14em;
-  text-transform: uppercase; margin-bottom: 3px;
-  font-family: var(--fnt-dot);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 10px; color: var(--gray); letter-spacing: .22em;
+  text-transform: uppercase; margin-bottom: 4px;
 }
 .field-value {
-  font-size: 16px; line-height: 1.4; color: var(--ink);
-  font-family: var(--fnt-body);
+  font-size: 21px; line-height: 1.35; color: var(--ink);
+  font-family: var(--fnt-body); font-weight: 700;
 }
 .field-translit {
-  font-size: 12px; color: var(--cyan); margin-top: 2px;
+  font-size: 14px; color: var(--red); margin-top: 3px;
   font-style: italic; letter-spacing: .02em;
 }
-.hidden-answer {
-  font-size: 16px; color: var(--rule);
-  letter-spacing: .25em; font-family: var(--fnt-dot);
-  cursor: pointer; user-select: none;
-  padding: 4px 0;
-}
-.tag-row {
-  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
-}
+.tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .gram-tag {
-  font-family: var(--fnt-dot); font-size: 9px; letter-spacing: .08em;
-  color: var(--muted); border: 1px solid var(--rule);
-  padding: 1px 5px;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 10px; letter-spacing: .1em;
+  color: var(--cream); background: var(--gray);
+  padding: 2px 7px; text-transform: uppercase;
 }
 
-/* GAP TIMER */
+/* text hidden by default — ear first */
+.reveal-text-btn {
+  display: inline-block; margin-top: 2px;
+  background: transparent; border: 2px dashed var(--gray);
+  color: var(--gray); cursor: pointer;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; letter-spacing: .14em; padding: 8px 16px;
+  text-transform: uppercase;
+}
+.reveal-text-btn:active { border-color: var(--red); color: var(--red); }
+
+/* GAP — the anticipation beat */
 .gap-bar-wrap {
-  margin: 6px 12px 0;
-  height: 6px; background: var(--rule); position: relative;
+  margin: 4px 14px 0;
+  height: 10px; background: var(--cream);
+  border: 2px solid var(--ink); position: relative;
 }
-.gap-bar {
-  height: 100%; background: var(--cyan);
-  transition: width .1s linear;
-}
+.gap-bar { height: 100%; background: var(--red); transition: width .1s linear; }
 .gap-label {
-  font-family: var(--fnt-dot); font-size: 10px; color: var(--cyan);
-  text-align: right; padding: 2px 12px 0;
-  letter-spacing: .06em;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; color: var(--red);
+  text-align: right; padding: 3px 14px 0; letter-spacing: .1em;
 }
+.gap-hint {
+  text-align: center; padding: 6px 12px 10px;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; color: var(--gray); letter-spacing: .14em;
+  text-transform: uppercase; cursor: pointer;
+}
+
+/* ECHO — listen and repeat beat */
+#echo-section {
+  margin: 4px 14px 8px; padding: 8px 12px;
+  background: var(--gold);
+  border-left: 6px solid var(--ink);
+}
+.echo-label {
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 13px; color: var(--ink); letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.echo-bar-wrap { height: 5px; background: rgba(26,26,26,.25); margin-top: 6px; }
+.echo-bar { height: 100%; background: var(--ink); transition: width .1s linear; }
 
 /* AUDIO BUTTON */
 .audio-btn {
-  margin: 8px 12px 4px;
-  background: var(--cyan); border: none; padding: 8px 14px;
-  font-family: var(--fnt-dot); font-size: 12px; color: var(--doc);
-  letter-spacing: .1em; cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  width: calc(100% - 24px);
+  margin: 8px 14px 4px;
+  background: var(--ink); border: none; padding: 10px 14px;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 13px; color: var(--cream);
+  letter-spacing: .14em; cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  width: calc(100% - 28px);
+  text-transform: uppercase;
 }
-.audio-btn:active { filter: brightness(.85); }
+.audio-btn:active { background: var(--red); }
 .audio-btn svg { flex-shrink: 0; }
 
-/* GRADING STAMPS */
-.grade-row {
-  display: flex; gap: 8px; padding: 8px 12px 4px; flex-wrap: wrap;
-}
+/* GRADING STAMPS — letterpress rubber stamps */
+.grade-row { display: flex; gap: 10px; padding: 10px 14px 12px; flex-wrap: wrap; }
 .stamp {
-  flex: 1; min-width: 80px;
+  flex: 1; min-width: 86px;
   display: flex; flex-direction: column; align-items: center;
-  border: 2px solid; padding: 8px 6px 6px;
+  border: 3px double; padding: 9px 6px 7px;
   cursor: pointer; position: relative;
-  font-family: var(--fnt-dot); letter-spacing: .06em;
-  transform: rotate(0deg); transition: transform .1s, filter .1s;
-  user-select: none;
+  font-family: var(--fnt-cond); font-weight: 700; letter-spacing: .08em;
+  background: transparent; user-select: none;
+  transition: transform .08s, filter .08s;
 }
-.stamp:active { filter: brightness(.8); transform: rotate(-1deg) scale(.97); }
-.stamp-main { font-size: 14px; text-align: center; line-height: 1.1; }
-.stamp-sub  { font-size: 9px;  text-align: center; margin-top: 4px; opacity: .75; }
-.stamp.approved  { border-color: var(--green); color: var(--green);
-  transform: rotate(-1.5deg); }
-.stamp.shaky    { border-color: var(--amber); color: var(--amber);
-  transform: rotate(.8deg); }
-.stamp.denied   { border-color: var(--red);   color: var(--red);
-  transform: rotate(-2deg); }
-.stamp::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    45deg, transparent, transparent 4px,
-    rgba(0,0,0,.03) 4px, rgba(0,0,0,.03) 5px);
+.stamp:active { filter: brightness(.75); transform: scale(.95); }
+.stamp-main {
+  font-size: 15px; text-align: center; line-height: 1.1;
+  text-transform: uppercase;
+  text-shadow: 0 0 1px currentColor; /* ink bleed */
 }
+.stamp-sub { font-size: 10px; text-align: center; margin-top: 4px; opacity: .7; }
+.stamp.approved { border-color: var(--red);  color: var(--red);  transform: rotate(-2deg); }
+.stamp.shaky    { border-color: var(--gold); color: #8a6d28;     transform: rotate(1deg);
+                  border-color: #8a6d28; }
+.stamp.denied   { border-color: var(--ink);  color: var(--ink);  transform: rotate(-1.2deg); }
+.stamp.approved:active { transform: rotate(-2deg) scale(.95); }
+.stamp.shaky:active    { transform: rotate(1deg) scale(.95); }
+.stamp.denied:active   { transform: rotate(-1.2deg) scale(.95); }
 
 /* FOOTER SERVICE RECORD */
 #service-record {
-  background: var(--ink); border-top: 1px solid var(--rule);
-  padding: 6px 12px; flex-shrink: 0;
+  background: var(--ink);
+  padding: 7px 14px; flex-shrink: 0;
   display: flex; justify-content: space-between; align-items: center;
 }
 .service-label {
-  font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
-  letter-spacing: .1em;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; color: var(--gold); letter-spacing: .18em;
 }
-.stazh-boxes {
-  display: flex; gap: 3px; margin-top: 2px;
-}
-.stazh-box {
-  width: 10px; height: 10px; border: 1px solid var(--rule);
-}
-.stazh-box.filled { background: var(--green); border-color: var(--green); }
+.stazh-boxes { display: flex; gap: 3px; margin-top: 3px; }
+.stazh-box { width: 11px; height: 11px; border: 1px solid var(--gray); }
+.stazh-box.filled { background: var(--red); border-color: var(--red); }
 .session-info {
-  font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
-  text-align: right; letter-spacing: .06em;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; color: var(--cream);
+  text-align: right; letter-spacing: .1em;
 }
 
-/* ── DECK LIST SCREEN ── */
-#deck-screen {
-  background: var(--desk); overflow-y: auto;
+/* ── LESSON DONE ── */
+#session-done {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; flex: 1; gap: 18px; padding: 24px;
 }
+.done-stamp {
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 26px; color: var(--red);
+  border: 4px double var(--red); padding: 14px 26px;
+  transform: rotate(-3deg); letter-spacing: .14em;
+  text-transform: uppercase;
+  text-shadow: 0 0 1px var(--red);
+}
+.done-stats {
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; color: var(--ink);
+  text-align: center; letter-spacing: .1em; line-height: 1.9;
+}
+
+/* ── DECK LIST ── */
 .deck-toolbar {
-  background: var(--hdr); border-bottom: 2px double var(--rule);
-  padding: 8px 12px;
+  background: var(--red);
+  padding: 9px 12px;
   display: flex; gap: 8px; align-items: center;
+  border-bottom: 3px solid var(--ink);
 }
 .deck-title {
-  font-family: var(--fnt-dot); font-size: 14px; color: var(--ink);
-  flex: 1; letter-spacing: .05em;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 14px; color: var(--cream);
+  flex: 1; letter-spacing: .12em; text-transform: uppercase;
 }
 .tool-btn {
-  background: var(--ink); border: none; color: var(--hdr);
-  font-family: var(--fnt-dot); font-size: 10px; letter-spacing: .08em;
-  padding: 5px 9px; cursor: pointer;
+  background: var(--ink); border: none; color: var(--cream);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; letter-spacing: .1em;
+  padding: 6px 10px; cursor: pointer; text-transform: uppercase;
 }
-.tool-btn:active { filter: brightness(.7); }
-.tool-btn.danger { color: #c4816e; }
+.tool-btn:active { background: var(--cream); color: var(--ink); }
 #deck-list-body { padding: 4px 0; }
 .deck-row {
-  display: flex; align-items: center; padding: 6px 12px;
-  border-bottom: 1px dotted var(--rule);
-  background: var(--doc);
+  display: flex; align-items: center; padding: 8px 12px;
+  border-bottom: 1px solid rgba(138,129,114,.4);
   gap: 8px; cursor: pointer;
 }
-.deck-row:nth-child(even) { background: var(--hdr); }
-.deck-row:hover { filter: brightness(.96); }
+.deck-row:hover { background: rgba(200,162,75,.15); }
 .dr-num {
-  font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
-  min-width: 52px; letter-spacing: .06em;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; color: var(--gray); min-width: 56px; letter-spacing: .06em;
 }
 .dr-en {
-  flex: 1; font-size: 12px; color: var(--ink);
+  flex: 1; font-size: 13px; color: var(--ink);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .dr-rung {
-  font-family: var(--fnt-dot); font-size: 10px; color: var(--cyan);
-  min-width: 38px; text-align: right; letter-spacing: .06em;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; color: var(--red); min-width: 40px; text-align: right;
 }
 .dr-due {
-  font-size: 9px; color: var(--muted); min-width: 52px;
-  text-align: right; letter-spacing: .04em;
+  font-size: 10px; color: var(--gray); min-width: 54px;
+  text-align: right;
 }
-.due-now { color: var(--green); }
+.due-now { color: var(--red); font-weight: 700; }
 #deck-empty {
-  text-align: center; color: var(--muted); font-family: var(--fnt-dot);
-  font-size: 13px; padding: 40px 20px; letter-spacing: .08em;
+  text-align: center; color: var(--gray);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 14px; padding: 40px 20px; letter-spacing: .14em;
 }
 
-/* ── ADD CARD SCREEN ── */
-#add-screen {
-  background: var(--desk); overflow-y: auto;
+/* ── FORMS / SETTINGS — state bulletin panels ── */
+.add-form, .settings-section {
+  background: var(--cream); margin: 10px;
+  border: 2px solid var(--ink); padding: 14px;
+  position: relative;
 }
-.add-form {
-  background: var(--doc); margin: 8px;
-  border: 1px solid var(--rule); padding: 12px;
+.add-title, .settings-title {
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 14px; color: var(--cream); background: var(--ink);
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 10px; margin: -14px -14px 12px;
 }
-.add-title {
-  font-family: var(--fnt-dot); font-size: 14px; color: var(--ink);
-  letter-spacing: .06em; border-bottom: 1px double var(--rule);
-  padding-bottom: 6px; margin-bottom: 10px;
-}
-.field-group { margin-bottom: 10px; }
+.field-group { margin-bottom: 11px; }
 .field-group label {
-  display: block; font-family: var(--fnt-dot); font-size: 9px;
-  color: var(--muted); letter-spacing: .14em; margin-bottom: 3px;
+  display: block; font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 10px; color: var(--gray); letter-spacing: .18em;
+  margin-bottom: 3px; text-transform: uppercase;
 }
 .field-group input, .field-group select, .field-group textarea {
   width: 100%; background: transparent;
-  border: none; border-bottom: 1px dotted var(--rule);
-  padding: 4px 2px; font-family: var(--fnt-body); font-size: 14px;
-  color: var(--ink); outline: none;
+  border: none; border-bottom: 2px solid var(--gray);
+  padding: 5px 2px; font-family: var(--fnt-body); font-size: 15px;
+  color: var(--ink); outline: none; border-radius: 0;
 }
-.field-group textarea { resize: none; height: 60px; font-size: 12px; }
-.field-group select {
-  font-size: 12px; cursor: pointer;
-  -webkit-appearance: none; appearance: none;
-}
+.field-group input:focus, .field-group textarea:focus { border-bottom-color: var(--red); }
+.field-group textarea { resize: none; height: 60px; font-size: 13px; }
+.field-group select { font-size: 13px; cursor: pointer; -webkit-appearance: none; appearance: none; }
 .paste-hint {
-  font-size: 9px; color: var(--muted); letter-spacing: .06em;
-  margin-bottom: 8px; line-height: 1.5;
+  font-size: 11px; color: var(--gray); letter-spacing: .04em;
+  margin-bottom: 10px; line-height: 1.5;
 }
 .submit-btn {
-  width: 100%; background: var(--ink); border: none;
-  color: var(--hdr); font-family: var(--fnt-dot); font-size: 16px;
-  letter-spacing: .12em; padding: 10px;
-  cursor: pointer; margin-top: 4px;
+  width: 100%; background: var(--red); border: none;
+  color: var(--cream); font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 16px; letter-spacing: .16em; padding: 11px;
+  cursor: pointer; margin-top: 4px; text-transform: uppercase;
+  box-shadow: 3px 3px 0 var(--ink);
 }
-.submit-btn:active { filter: brightness(.7); }
+.submit-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
 
-.paste-area-label {
-  font-family: var(--fnt-dot); font-size: 9px; color: var(--muted);
-  letter-spacing: .12em; margin-bottom: 3px; display: block;
-}
-.paste-area { font-size: 11px !important; height: 70px !important; }
-.import-btn {
-  background: var(--cyan); border: none; color: var(--doc);
-  font-family: var(--fnt-dot); font-size: 12px; letter-spacing: .1em;
-  padding: 7px 14px; cursor: pointer; margin-top: 4px; width: 100%;
-}
-
-/* ── SETTINGS / EXPORT SCREEN ── */
-#settings-screen {
-  background: var(--desk); overflow-y: auto;
-}
-.settings-section {
-  background: var(--doc); margin: 8px;
-  border: 1px solid var(--rule); padding: 12px;
-}
-.settings-title {
-  font-family: var(--fnt-dot); font-size: 13px; color: var(--ink);
-  letter-spacing: .06em; border-bottom: 1px dotted var(--rule);
-  padding-bottom: 5px; margin-bottom: 10px;
-}
-.settings-row {
-  display: flex; gap: 8px; margin-bottom: 8px; align-items: center;
-}
+.settings-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
 .settings-row label {
-  flex: 1; font-family: var(--fnt-dot); font-size: 10px; color: var(--muted);
-  letter-spacing: .1em;
+  flex: 1; font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 11px; color: var(--ink); letter-spacing: .1em;
+  text-transform: uppercase;
 }
 .settings-btn {
-  background: var(--ink); border: none; color: var(--hdr);
-  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .08em;
-  padding: 6px 10px; cursor: pointer;
+  background: var(--ink); border: none; color: var(--cream);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; letter-spacing: .1em;
+  padding: 7px 12px; cursor: pointer; text-transform: uppercase;
 }
-.settings-btn:active { filter: brightness(.7); }
-.settings-btn.danger { color: #c4816e; }
-.settings-btn.primary { background: var(--cyan); color: var(--doc); }
-
-/* ── START BTN ── */
-.post-btn {
-  background: var(--green); border: none; color: var(--doc);
-  font-family: var(--fnt-dot); font-size: 20px; letter-spacing: .12em;
-  padding: 14px 28px; cursor: pointer;
-  border: 2px solid rgba(255,255,255,.15);
-  box-shadow: 0 2px 8px rgba(0,0,0,.4);
-}
-.post-btn:active { filter: brightness(.85); transform: scale(.98); }
-.post-btn:disabled { background: var(--rule); color: var(--muted); cursor: default; }
-
-/* ── SESSION DONE ── */
-#session-done {
-  display: none; flex-direction: column; align-items: center;
-  justify-content: center; flex: 1; gap: 16px; padding: 24px;
-}
-.done-stamp {
-  font-family: var(--fnt-dot); font-size: 28px; color: var(--green);
-  border: 3px solid var(--green); padding: 12px 24px;
-  transform: rotate(-3deg); letter-spacing: .1em;
-}
-.done-stats {
-  font-family: var(--fnt-dot); font-size: 11px; color: var(--muted);
-  text-align: center; letter-spacing: .08em; line-height: 1.8;
+.settings-btn:active { background: var(--gray); }
+.settings-btn.danger  { background: var(--red); }
+.settings-btn.primary { background: var(--red); }
+.key-warning {
+  font-size: 11px; color: var(--red); line-height: 1.5;
+  border-left: 4px solid var(--red); padding-left: 8px; margin: 8px 0;
 }
 
 /* ── TOAST ── */
 #toast {
   position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-  background: var(--ink); color: var(--hdr);
-  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .1em;
-  padding: 7px 16px; border: 1px solid var(--rule);
+  background: var(--ink); color: var(--cream);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; letter-spacing: .12em;
+  padding: 8px 18px; border-left: 5px solid var(--red);
   pointer-events: none; opacity: 0; transition: opacity .3s;
-  z-index: 99; white-space: nowrap;
+  z-index: 99; white-space: nowrap; text-transform: uppercase;
 }
 #toast.show { opacity: 1; }
 
 /* ── MODAL ── */
 #modal-overlay {
   display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.6); z-index: 50;
+  background: rgba(26,26,26,.7); z-index: 50;
   align-items: center; justify-content: center;
 }
 #modal-overlay.open { display: flex; }
 .modal-box {
-  background: var(--doc); border: 1px solid var(--rule);
-  padding: 16px; max-width: 300px; width: 90%;
-  position: relative;
+  background: var(--cream); border: 3px solid var(--ink);
+  padding: 16px; max-width: 320px; width: 90%;
 }
 .modal-title {
-  font-family: var(--fnt-dot); font-size: 14px; color: var(--ink);
-  letter-spacing: .06em; margin-bottom: 10px;
-  border-bottom: 1px dotted var(--rule); padding-bottom: 6px;
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 15px; color: var(--cream); background: var(--red);
+  letter-spacing: .1em; margin: -16px -16px 12px; padding: 7px 12px;
+  text-transform: uppercase;
 }
-.modal-body {
-  font-size: 12px; color: var(--ink); line-height: 1.6; margin-bottom: 12px;
-}
+.modal-body { font-size: 14px; color: var(--ink); line-height: 1.6; margin-bottom: 14px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 .modal-btn {
-  background: var(--ink); border: none; color: var(--hdr);
-  font-family: var(--fnt-dot); font-size: 11px; letter-spacing: .08em;
-  padding: 6px 12px; cursor: pointer;
+  background: var(--ink); border: none; color: var(--cream);
+  font-family: var(--fnt-cond); font-weight: 700;
+  font-size: 12px; letter-spacing: .1em;
+  padding: 7px 14px; cursor: pointer; text-transform: uppercase;
 }
-.modal-btn.danger { background: var(--red); color: var(--hdr); }
+.modal-btn.danger { background: var(--red); }
 .modal-btn:active { filter: brightness(.75); }
 
-/* scrollbar */
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--desk); }
-::-webkit-scrollbar-thumb { background: var(--rule); }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--gray); }
 </style>
 </head>
 <body>
-<div id="app">
+<div id="app" class="grain">
 
-  <!-- HEADER -->
-  <header id="hdr" class="scan">
+  <!-- MASTHEAD -->
+  <header id="hdr">
     <div class="hdr-top">
       <div class="emblem">
-        <svg viewBox="0 0 100 100" width="34" height="34" role="img" aria-label="Hammer and sickle">
-          <g fill="#8a2b22">
-            <path d="M72 18 q20 16 11 44 q-4 14 -18 21 l-6 -10 q11 -5 13 -16 q5 -18 -8 -30 z"/>
-            <path d="M58 34 l10 10 -34 34 q-5 5 -11 0 q-5 -5 0 -11 z"/>
-            <rect x="19" y="70" width="42" height="9" rx="2" transform="rotate(-45 40 74)"/>
-            <polygon points="50,8 53,18 64,18 55,24 58,34 50,28 42,34 45,24 36,18 47,18" fill="#8a2b22"/>
+        <svg viewBox="0 0 100 100" width="40" height="40" role="img" aria-label="Hammer and sickle">
+          <g fill="#EFE6D0">
+            <!-- sickle: crescent from two circles -->
+            <path fill-rule="evenodd" d="M46 12a36 36 0 1 0 .02 0zM56 20a30 30 0 1 1-.02 0z"
+                  transform="rotate(20 48 48)"/>
+            <!-- sickle handle -->
+            <rect x="66" y="60" width="9" height="26" rx="1.5" transform="rotate(-45 70 73)"/>
+            <!-- hammer handle -->
+            <rect x="16" y="62" width="52" height="8" rx="1.5" transform="rotate(-45 42 66)"/>
+            <!-- hammer head -->
+            <path d="M56 12l16 16-9 9-16-16z"/>
+            <rect x="66" y="6" width="14" height="22" rx="1.5" transform="rotate(45 73 17)"/>
           </g>
         </svg>
       </div>
-      <div class="ministry-name">
+      <div class="ministry-name misreg">
         МИНИСТЕРСТВО ЯЗЫКОВОГО ПРОСВЕЩЕНИЯ
-        <div class="ministry-sub">ОТДЕЛ ВОССТАНОВЛЕНИЯ · СЕКЦИЯ ДРЕЛИ</div>
+        <div class="ministry-sub">Отдел восстановления</div>
       </div>
     </div>
     <div class="hdr-meta">
@@ -542,42 +594,49 @@ html, body {
       ⚠ ГОЛОС RU-RU НЕ НАЙДЕН — Настройки → Спец. возможности → Речь → Голоса
     </div>
 
-    <!-- SESSION START -->
+    <!-- LESSON START -->
     <div id="session-start">
-      <div class="ss-title">ЗАСТУПИТЬ НА ПОСТ</div>
+      <div class="ss-star">
+        <svg viewBox="0 0 100 100" width="72" height="72" role="img" aria-label="Red star">
+          <polygon fill="#C1121F" stroke="#C8A24B" stroke-width="2"
+            points="50,10 59.4,37.1 88,37.6 65.2,54.9 73.5,82.4 50,66 26.5,82.4 34.8,54.9 12,37.6 40.6,37.1"/>
+        </svg>
+      </div>
+      <div class="ss-title misreg">ЗАСТУПИТЬ НА ПОСТ</div>
       <div class="ss-sub">
-        ОТДЕЛ ВОССТАНОВЛЕНИЯ ЯЗЫКОВОГО ПРОСВЕЩЕНИЯ<br>
-        ГРАЖДАНИН, ВАШИ ДОКУМЕНТЫ
+        Отдел восстановления языкового просвещения<br>
+        Гражданин, ваши документы
       </div>
       <div class="ss-stats">
         КАРТ К ПОВТОРЕНИЮ: <span id="due-count">…</span><br>
+        НОВЫХ К ВВОДУ: <span id="new-count">…</span><br>
         ВСЕГО В ДЕЛЕ: <span id="total-count">…</span>
       </div>
-      <button class="post-btn" id="start-btn" onclick="startSession()">
-        ▶ ЗАСТУПИТЬ НА ПОСТ
+      <button class="post-btn" id="start-btn" onclick="startLesson()">
+        ЗАСТУПИТЬ НА ПОСТ
       </button>
-      <div id="no-cards-msg" style="display:none;font-family:var(--fnt-dot);font-size:11px;color:var(--muted);text-align:center;letter-spacing:.08em;">
+      <div id="no-cards-msg" style="display:none;font-family:var(--fnt-cond);font-weight:700;font-size:12px;color:var(--gray);text-align:center;letter-spacing:.12em;">
         НЕТ КАРТ ДЛЯ ПОВТОРЕНИЯ.<br>СЛЕДУЮЩАЯ СМЕНА СКОРО.
       </div>
     </div>
 
     <!-- DRILL AREA -->
     <div id="drill-area">
-      <div class="dossier" id="dossier">
-        <div class="dossier-header">
-          <span class="dossier-label" id="card-label">ПРЕДЪЯВИТЬ ПЕРЕВОД ⟶</span>
+      <div class="bulletin halftone" id="bulletin">
+        <div class="bulletin-header">
+          <span class="bulletin-label" id="card-label">ПРЕДЪЯВИТЬ ПЕРЕВОД</span>
           <span class="clearance-badge" id="card-clearance">УРОВЕНЬ 0</span>
         </div>
+        <div class="bulletin-rule"></div>
 
         <!-- PROMPT SECTION -->
-        <div class="dossier-section" id="prompt-section">
-          <div class="field-label" id="prompt-field-label">ИСТОЧНИК · АНГЛИЙСКИЙ</div>
+        <div class="bulletin-section" id="prompt-section">
+          <div class="field-label" id="prompt-field-label">ЗАДАНИЕ</div>
           <div class="field-value" id="prompt-text"></div>
-          <div class="tag-row" id="prompt-tags"></div>
         </div>
 
-        <!-- AUDIO PROMPT (ru2en only) -->
-        <div class="dossier-section" id="audio-prompt-section" style="display:none;">
+        <!-- PROMPT AUDIO (ear-first modes) -->
+        <div id="audio-prompt-section" style="display:none;">
           <button class="audio-btn" id="audio-prompt-btn" onclick="playPromptAudio()">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <polygon points="3,2 13,8 3,14" fill="currentColor"/>
@@ -586,40 +645,40 @@ html, body {
           </button>
         </div>
 
-        <!-- GAP SECTION -->
+        <!-- GAP: anticipation beat -->
         <div id="gap-section" style="display:none;">
+          <div class="field-label" style="padding:8px 14px 0;">ПРОИЗНЕСИТЕ ОТВЕТ ВСЛУХ</div>
           <div class="gap-bar-wrap"><div class="gap-bar" id="gap-bar"></div></div>
-          <div class="gap-label" id="gap-label">6с</div>
-          <div style="text-align:center;padding:4px 12px;">
-            <span style="font-family:var(--fnt-dot);font-size:10px;color:var(--muted);letter-spacing:.08em;">
-              НАЖМИТЕ ДЛЯ ДОСРОЧНОГО РАСКРЫТИЯ
-            </span>
-          </div>
+          <div class="gap-label" id="gap-label">6С</div>
+          <div class="gap-hint" onclick="skipGap()">НАЖМИТЕ — ДОСРОЧНОЕ РАСКРЫТИЕ</div>
         </div>
 
-        <!-- ANSWER SECTION -->
-        <div class="dossier-section" id="answer-section" style="display:none;">
-          <div class="field-label">ВЕРНЫЙ ОТВЕТ · ШТАМП ДЕЛА</div>
-          <div class="field-value" id="answer-text"></div>
-          <div class="field-translit" id="answer-translit"></div>
-          <div class="tag-row" id="answer-tags"></div>
-          <button class="audio-btn" id="audio-answer-btn" onclick="playAnswerAudio()" style="margin-top:8px;">
+        <!-- ANSWER SECTION (text hidden by default — ear first) -->
+        <div class="bulletin-section" id="answer-section" style="display:none;">
+          <div class="field-label" id="answer-field-label">ВЕРНЫЙ ОТВЕТ</div>
+          <div id="answer-hidden-wrap">
+            <button class="reveal-text-btn" onclick="revealText()">ПОКАЗАТЬ ТЕКСТ ▸</button>
+          </div>
+          <div id="answer-text-wrap" style="display:none;">
+            <div class="field-value" id="answer-text"></div>
+            <div class="field-translit" id="answer-translit"></div>
+            <div class="tag-row" id="answer-tags"></div>
+          </div>
+          <button class="audio-btn" onclick="playAnswerAudio()" style="margin:10px 0 4px;width:100%;">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <polygon points="3,2 13,8 3,14" fill="currentColor"/>
             </svg>
-            ВОСПРОИЗВЕСТИ ЗАПИСЬ
+            ВОСПРОИЗВЕСТИ ЕЩЁ РАЗ
           </button>
         </div>
 
-        <!-- HIDDEN ANSWER (during gap) -->
-        <div class="dossier-section" id="hidden-answer-section" style="display:none;">
-          <div class="field-label">ОТВЕТ · ЗАСЕКРЕЧЕН</div>
-          <div class="hidden-answer" id="hidden-answer-tap" onclick="skipGap()">
-            ▓▓▓ ▓▓▓▓▓▓▓▓ ▓▓▓▓▓
-          </div>
+        <!-- ECHO: repeat-aloud beat -->
+        <div id="echo-section" style="display:none;">
+          <div class="echo-label">ПОВТОРИТЕ ВСЛУХ</div>
+          <div class="echo-bar-wrap"><div class="echo-bar" id="echo-bar"></div></div>
         </div>
 
-        <!-- GRADING -->
+        <!-- GRADING STAMPS -->
         <div class="grade-row" id="grade-row" style="display:none;">
           <button class="stamp approved" onclick="grade('got')">
             <div class="stamp-main">ОДОБРЕНО</div>
@@ -637,21 +696,21 @@ html, body {
       </div>
 
       <!-- BACKWARD BUILDUP -->
-      <div id="buildup-section" style="display:none;padding:4px 8px 0;">
-        <div class="dossier" style="padding-bottom:8px;">
-          <div class="dossier-header">
-            <span class="dossier-label">ОБРАТНАЯ СБОРКА · PIMSLEUR</span>
+      <div id="buildup-section" style="display:none;padding:0 10px;">
+        <div class="bulletin halftone" style="margin:0;">
+          <div class="bulletin-header">
+            <span class="bulletin-label">ОБРАТНАЯ СБОРКА</span>
           </div>
-          <div id="buildup-chunks" style="padding:8px 12px;"></div>
+          <div id="buildup-chunks" style="padding:8px 0;"></div>
         </div>
       </div>
     </div>
 
-    <!-- SESSION DONE -->
+    <!-- LESSON DONE -->
     <div id="session-done">
       <div class="done-stamp">СМЕНА ЗАВЕРШЕНА</div>
       <div class="done-stats" id="done-stats"></div>
-      <button class="post-btn" onclick="endSession()" style="font-size:14px;padding:10px 20px;">
+      <button class="post-btn" onclick="endLesson()" style="font-size:14px;padding:11px 22px;">
         ПОКИНУТЬ ПОСТ
       </button>
     </div>
@@ -662,7 +721,7 @@ html, body {
         <div class="service-label">СТАЖ</div>
         <div class="stazh-boxes" id="stazh-boxes"></div>
       </div>
-      <div class="session-info" id="session-info">СМЕНА 1 · 0 КАРТ</div>
+      <div class="session-info" id="session-info">СМЕНА 1</div>
     </div>
   </section>
 
@@ -671,7 +730,7 @@ html, body {
     <div class="deck-toolbar">
       <div class="deck-title">КАРТОТЕКА · РЕЕСТР ДЕЛ</div>
       <button class="tool-btn" onclick="showScreen('add')">+ ПОДАТЬ</button>
-      <button class="tool-btn danger" id="clear-deck-btn" onclick="confirmClearDeck()">ОЧИСТИТЬ</button>
+      <button class="tool-btn" id="clear-deck-btn" onclick="confirmClearDeck()">ОЧИСТИТЬ</button>
     </div>
     <div id="deck-list-body">
       <div id="deck-empty">КАРТОТЕКА ПУСТА</div>
@@ -684,13 +743,13 @@ html, body {
       <div class="add-title">ПОДАЧА НОВОЙ КАРТОЧКИ</div>
 
       <div class="paste-hint">
-        ВСТАВЬТЕ ОДНУ СТРОКУ: Английский | Русский (с ударениями) | транслит<br>
-        ИЛИ ЗАПОЛНИТЕ ПОЛЯ ВРУЧНУЮ
+        Вставьте одну строку: Английский | Русский (с ударениями) | транслит —
+        или заполните поля вручную.
       </div>
 
       <div class="field-group">
-        <label class="paste-area-label">ВСТАВИТЬ СТРОКУ</label>
-        <textarea class="paste-area" id="paste-input"
+        <label>ВСТАВИТЬ СТРОКУ</label>
+        <textarea id="paste-input"
           placeholder="Hello | Приве́т | Privét"
           oninput="parsePasteRow(this.value)"></textarea>
       </div>
@@ -723,27 +782,27 @@ html, body {
         </select>
       </div>
       <div class="field-group">
-        <label>ПАУЗА (секунды)</label>
+        <label>ПАУЗА (СЕКУНДЫ)</label>
         <input type="number" id="add-gap" value="6" min="2" max="30">
       </div>
-      <button class="submit-btn" onclick="submitCard()">▶ ПОДАТЬ</button>
+      <button class="submit-btn" onclick="submitCard()">ПОДАТЬ</button>
     </div>
 
-    <div class="add-form" style="margin-top:0;">
+    <div class="add-form">
       <div class="add-title">ИМПОРТ ПАКЕТА</div>
-      <div class="paste-hint">ЗАГРУЗИТЬ JSON ЭКСПОРТ (КОЛОДА ± АУДИО)</div>
+      <div class="paste-hint">Загрузить JSON-экспорт (колода ± аудио).</div>
       <div class="settings-row">
         <button class="settings-btn primary" onclick="document.getElementById('import-file').click()">
           ВЫБРАТЬ ФАЙЛ
         </button>
         <input type="file" id="import-file" accept=".json" style="display:none" onchange="importDeck(this)">
-        <button class="settings-btn" onclick="importAudioPack()">ИМПОРТ АУДИО</button>
+        <button class="settings-btn" onclick="document.getElementById('import-audio-file').click()">ИМПОРТ АУДИО</button>
         <input type="file" id="import-audio-file" accept=".json" style="display:none" onchange="importAudioPackFile(this)">
       </div>
     </div>
   </section>
 
-  <!-- SETTINGS / EXPORT SCREEN -->
+  <!-- SETTINGS / DOSSIER SCREEN -->
   <section id="settings-screen" class="screen">
     <div class="settings-section">
       <div class="settings-title">ЭКСПОРТ ДАННЫХ</div>
@@ -757,15 +816,57 @@ html, body {
       </div>
     </div>
 
+    <!-- AUDIO PROVIDER (Workstream A) -->
+    <div class="settings-section">
+      <div class="settings-title">ЗВУКОЗАПИСЬ · ИСТОЧНИК ГОЛОСА</div>
+      <div class="paste-hint">
+        Основной путь — офлайн-генератор <b>gen_audio.mjs</b> (ключ в переменной
+        окружения, пакет импортируется на вкладке ПОДАТЬ). Синтез из приложения —
+        запасной вариант.
+      </div>
+      <div class="field-group">
+        <label>ПОСТАВЩИК</label>
+        <select id="tts-provider" onchange="saveTtsSettings()">
+          <option value="google-chirp3hd">Google Chirp 3: HD</option>
+          <option value="google-wavenet">Google WaveNet / Neural2</option>
+          <option value="azure" disabled>Azure Speech (скоро)</option>
+          <option value="polly" disabled>Amazon Polly (скоро)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>КЛЮЧ API (ХРАНИТСЯ ТОЛЬКО НА УСТРОЙСТВЕ)</label>
+        <input type="password" id="tts-key" placeholder="AIza..." onchange="saveTtsSettings()">
+      </div>
+      <div class="key-warning">
+        Ключ, введённый в браузер, виден этому устройству и уходит только на
+        серверы поставщика. Это ваш риск — предпочитайте офлайн-генератор.
+        Ключ никогда не попадает в экспорт и не публикуется с сайтом.
+      </div>
+      <div class="settings-row">
+        <label>ГОЛОС</label>
+        <button class="settings-btn" onclick="loadVoices()">ЗАГРУЗИТЬ ГОЛОСА</button>
+      </div>
+      <div class="field-group">
+        <select id="tts-voice" onchange="saveTtsSettings()">
+          <option value="">— сначала загрузите список —</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label>ОЗВУЧИТЬ КАРТЫ БЕЗ АУДИО</label>
+        <button class="settings-btn primary" onclick="synthMissingAudio()">СИНТЕЗ</button>
+      </div>
+      <div id="synth-progress" style="font-size:11px;color:var(--gray);"></div>
+    </div>
+
     <div class="settings-section">
       <div class="settings-title">СТАТИСТИКА</div>
-      <div id="stats-body" style="font-family:var(--fnt-dot);font-size:11px;color:var(--muted);line-height:1.8;letter-spacing:.06em;"></div>
+      <div id="stats-body" style="font-family:var(--fnt-cond);font-weight:700;font-size:12px;color:var(--ink);line-height:1.9;letter-spacing:.08em;"></div>
     </div>
 
     <div class="settings-section">
       <div class="settings-title">ОПАСНАЯ ЗОНА</div>
       <div class="settings-row">
-        <label>СБРОСИТЬ ВСЕ ПРОГРЕССЫ (ОСТАВИТЬ КАРТЫ)</label>
+        <label>СБРОСИТЬ ВЕСЬ ПРОГРЕСС (ОСТАВИТЬ КАРТЫ)</label>
         <button class="settings-btn danger" onclick="confirmResetProgress()">СБРОС</button>
       </div>
       <div class="settings-row">
@@ -776,11 +877,11 @@ html, body {
 
     <div class="settings-section">
       <div class="settings-title">ОБ УСТАНОВКЕ (iOS)</div>
-      <div style="font-size:10px;color:var(--muted);line-height:1.7;letter-spacing:.05em;">
-        1. ОТКРОЙТЕ В SAFARI<br>
-        2. НАЖМИТЕ ПОДЕЛИТЬСЯ (□↑)<br>
-        3. «НА ЭКРАН ДОМ»<br>
-        4. ТОЛЬКО SAFARI ПОДДЕРЖИВАЕТ УСТАНОВКУ PWA НА iOS
+      <div style="font-size:12px;color:var(--gray);line-height:1.7;">
+        1. Откройте в Safari<br>
+        2. Нажмите Поделиться (□↑)<br>
+        3. «На экран Дом»<br>
+        4. Только Safari поддерживает установку PWA на iOS
       </div>
     </div>
   </section>
@@ -805,23 +906,25 @@ html, body {
 // ── CONSTANTS ──────────────────────────────────────────────
 const DB_NAME = 'russian_drill';
 const DB_VER  = 1;
+// Cross-session ladder — unchanged: 30s 2m 10m 1h 5h 1d 3d 7d 21d 60d
 const LADDER_MS = [30000,120000,600000,3600000,18000000,
                    86400000,259200000,604800000,1814400000,5184000000];
+// Intra-lesson graduated recall: re-surface after N intervening items
+const INTRA_STEPS   = [1, 3, 7, 15];
+const NEW_PER_LESSON = 4;   // new cards mixed into a lesson
+const LESSON_CAP     = 30;  // max presentations per lesson (bounded sitting)
+const ECHO_SECONDS   = 4;   // repeat-aloud beat after reveal
 
 // ── STATE ──────────────────────────────────────────────────
 let db = null;
-let sessionQueue   = [];
-let sessionIdx     = 0;
-let currentCard    = null;
-let phase          = 'idle'; // idle | prompt | gap | reveal | grade
-let gapTimer       = null;
-let gapRemaining   = 0;
-let sessionGraded  = 0;
-let sessionCorrect = 0;
-let sessionNum     = 1;
-let audioCtxPrimed = false;
-let audioCtx       = null;
+let lesson = null;   // { items: Map(id→entry), pool: [card], counter, presented, graded, correct }
+let current = null;  // active entry { card, mode, step, nextAt, isNew }
+let phase = 'idle';  // idle | prompt | gap | reveal
+let gapTimer = null, echoTimer = null;
+let sessionNum = 1;
+let audioCtx = null, audioCtxPrimed = false;
 let currentAudioSrc = null;
+let wakeLock = null;
 
 // ── DB ─────────────────────────────────────────────────────
 function openDB() {
@@ -838,47 +941,44 @@ function openDB() {
     req.onerror   = e => rej(e.target.error);
   });
 }
-
 function txGet(store, key) {
   return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readonly');
-    const req = tx.objectStore(store).get(key);
+    const req = db.transaction(store, 'readonly').objectStore(store).get(key);
     req.onsuccess = e => res(e.target.result);
     req.onerror   = e => rej(e.target.error);
   });
 }
-
 function txGetAll(store) {
   return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readonly');
-    const req = tx.objectStore(store).getAll();
+    const req = db.transaction(store, 'readonly').objectStore(store).getAll();
     req.onsuccess = e => res(e.target.result);
     req.onerror   = e => rej(e.target.error);
   });
 }
-
+function txGetAllKeys(store) {
+  return new Promise((res, rej) => {
+    const req = db.transaction(store, 'readonly').objectStore(store).getAllKeys();
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
 function txPut(store, obj) {
   return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readwrite');
-    const req = tx.objectStore(store).put(obj);
+    const req = db.transaction(store, 'readwrite').objectStore(store).put(obj);
     req.onsuccess = e => res(e.target.result);
     req.onerror   = e => rej(e.target.error);
   });
 }
-
 function txDelete(store, key) {
   return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readwrite');
-    const req = tx.objectStore(store).delete(key);
+    const req = db.transaction(store, 'readwrite').objectStore(store).delete(key);
     req.onsuccess = e => res(e.target.result);
     req.onerror   = e => rej(e.target.error);
   });
 }
-
 function txClear(store) {
   return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readwrite');
-    const req = tx.objectStore(store).clear();
+    const req = db.transaction(store, 'readwrite').objectStore(store).clear();
     req.onsuccess = () => res();
     req.onerror   = e => rej(e.target.error);
   });
@@ -887,11 +987,8 @@ function txClear(store) {
 // ── INIT ───────────────────────────────────────────────────
 async function init() {
   db = await openDB();
-  // Request persistent storage
-  if (navigator.storage && navigator.storage.persist)
-    navigator.storage.persist();
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
 
-  // Seed from deck.json if empty
   const cards = await txGetAll('cards');
   if (cards.length === 0) {
     try {
@@ -900,15 +997,15 @@ async function init() {
         const seed = await r.json();
         const now = Date.now();
         for (const c of seed) {
-          c.created = now;
-          c.due = 0;
+          c.created = now; c.due = 0;
           await txPut('cards', c);
         }
         toast('ЗАГРУЖЕНО ' + seed.length + ' ИСХОДНЫХ КАРТ');
       }
-    } catch(e) { /* no deck.json available */ }
+    } catch(e) {}
   }
 
+  loadTtsSettings();
   checkRuVoice();
   await refreshUI();
   registerSW();
@@ -917,212 +1014,344 @@ async function init() {
 // ── VOICE CHECK ────────────────────────────────────────────
 function checkRuVoice() {
   const check = () => {
-    const voices = speechSynthesis.getVoices();
-    const hasRu  = voices.some(v => v.lang.startsWith('ru'));
-    document.getElementById('no-russian-voice').style.display =
-      hasRu ? 'none' : 'block';
+    const hasRu = speechSynthesis.getVoices().some(v => v.lang.startsWith('ru'));
+    document.getElementById('no-russian-voice').style.display = hasRu ? 'none' : 'block';
   };
   if (speechSynthesis.onvoiceschanged !== undefined)
     speechSynthesis.onvoiceschanged = check;
   check();
 }
 
+// ── CARD CLASSIFICATION ────────────────────────────────────
+const isNewCard = c => !c.lastReviewed;
+
+function introStateOf(c) {
+  if (c.intro_state) return c.intro_state;
+  return (c.rung > 0 || c.lastReviewed) ? 'production' : 'new';
+}
+
 // ── REFRESH UI ─────────────────────────────────────────────
 async function refreshUI() {
   const cards = await txGetAll('cards');
   const now   = Date.now();
-  const due   = cards.filter(c => c.due <= now);
+  const due   = cards.filter(c => !isNewCard(c) && c.due <= now);
+  const fresh = cards.filter(isNewCard);
 
   document.getElementById('due-count').textContent   = due.length;
+  document.getElementById('new-count').textContent   = Math.min(fresh.length, NEW_PER_LESSON);
   document.getElementById('total-count').textContent = cards.length;
   document.getElementById('hdr-due-count').textContent =
-    due.length > 0 ? due.length + ' К ПОВТОРЕНИЮ' : '';
+    (due.length + fresh.length) > 0 ? (due.length + Math.min(fresh.length, NEW_PER_LESSON)) + ' В ОЧЕРЕДИ' : '';
 
-  const startBtn    = document.getElementById('start-btn');
-  const noCardsMsg  = document.getElementById('no-cards-msg');
-  if (due.length === 0) {
-    startBtn.disabled    = true;
-    noCardsMsg.style.display = 'block';
-  } else {
-    startBtn.disabled    = false;
-    noCardsMsg.style.display = 'none';
-  }
+  const startBtn   = document.getElementById('start-btn');
+  const noCardsMsg = document.getElementById('no-cards-msg');
+  const anything = due.length + fresh.length > 0;
+  startBtn.disabled = !anything;
+  noCardsMsg.style.display = anything ? 'none' : 'block';
 
-  // Update stats screen
   const byRung = Array(10).fill(0);
   for (const c of cards) byRung[Math.min(c.rung, 9)]++;
   let statsHtml = '';
-  const rungNames = ['30с','2м','10м','1ч','5ч','1д','3д','7д','21д','60д'];
-  for (let i = 0; i < 10; i++) {
-    if (byRung[i]) statsHtml +=
-      `СТУПЕНЬ ${i} (${rungNames[i]}): ${byRung[i]} КАРТ<br>`;
-  }
+  const rungNames = ['30С','2М','10М','1Ч','5Ч','1Д','3Д','7Д','21Д','60Д'];
+  for (let i = 0; i < 10; i++)
+    if (byRung[i]) statsHtml += `СТУПЕНЬ ${i} (${rungNames[i]}): ${byRung[i]} КАРТ<br>`;
   if (cards.length === 0) statsHtml = 'КАРТОТЕКА ПУСТА';
   const sb = document.getElementById('stats-body');
   if (sb) sb.innerHTML = statsHtml;
 }
 
-// ── SESSION ────────────────────────────────────────────────
-async function startSession() {
-  // Prime audio context (iOS gesture unlock)
+// ── LESSON (bounded sitting, intra-session scheduler) ──────
+async function startLesson() {
   primeAudio();
 
   const cards = await txGetAll('cards');
   const now   = Date.now();
-  sessionQueue   = cards.filter(c => c.due <= now).sort((a,b) => a.due - b.due);
-  sessionIdx     = 0;
-  sessionGraded  = 0;
-  sessionCorrect = 0;
+  const reviews = cards.filter(c => !isNewCard(c) && c.due <= now)
+                       .sort((a,b) => a.due - b.due);
+  const fresh   = cards.filter(isNewCard).slice(0, NEW_PER_LESSON);
 
-  if (sessionQueue.length === 0) return;
+  // Interleave: a couple of reviews, then a new card, etc.
+  const pool = reviews.slice();
+  fresh.forEach((c, i) => pool.splice(Math.min(i * 3, pool.length), 0, c));
+  if (pool.length === 0) return;
 
-  // Request Wake Lock
+  lesson = { items: new Map(), pool, counter: 0, presented: 0, graded: 0, correct: 0 };
+
   try {
-    if ('wakeLock' in navigator) {
-      await navigator.wakeLock.request('screen');
-    }
-  } catch(e) { /* not critical */ }
+    if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
+  } catch(e) {}
 
   document.getElementById('session-start').style.display = 'none';
   document.getElementById('session-done').style.display  = 'none';
   document.getElementById('drill-area').style.display    = 'flex';
 
   updateServiceRecord();
-  showCard(sessionQueue[0]);
+  nextPresentation();
 }
 
-function primeAudio() {
-  if (audioCtxPrimed) return;
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // Play a silent buffer to unlock iOS
-    const buf = audioCtx.createBuffer(1, 1, 22050);
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    src.connect(audioCtx.destination);
-    src.start(0);
-    audioCtxPrimed = true;
-  } catch(e) {}
-  // Also prime HTML audio
-  const a = document.createElement('audio');
-  a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
-  a.play().catch(()=>{});
+function introduce(card) {
+  const isNew = isNewCard(card);
+  let state = introStateOf(card);
+  if (state === 'new') { state = 'comprehension'; card.intro_state = 'comprehension'; }
+  // Comprehension mode: hear Russian, grasp meaning. Applies to brand-new
+  // cards being introduced and to ru2en cards by design.
+  const mode = (card.direction === 'ru2en' || state === 'comprehension')
+    ? 'comprehension' : 'production';
+  const entry = {
+    card, mode, isNew,
+    // New cards climb the whole intra ladder; known reviews retire on one clean hit
+    step: isNew ? 0 : INTRA_STEPS.length,
+    nextAt: lesson.counter
+  };
+  lesson.items.set(card.id, entry);
+  return entry;
 }
 
-function showCard(card) {
-  currentCard = card;
-  phase = 'prompt';
-  clearGapTimer();
+function nextPresentation() {
+  const L = lesson;
+  // 1. an active card whose re-surface point has arrived
+  let pick = null;
+  for (const e of L.items.values())
+    if (e.nextAt <= L.counter && (!pick || e.nextAt < pick.nextAt)) pick = e;
 
-  document.getElementById('hdr-caso').textContent    = 'ДЕЛО ' + card.id;
-  document.getElementById('hdr-rung').textContent    = card.rung;
-  document.getElementById('card-clearance').textContent = 'УРОВЕНЬ ' + card.rung;
+  // 2. otherwise introduce the next pooled card (respecting the cap)
+  if (!pick && L.pool.length && L.presented < LESSON_CAP)
+    pick = introduce(L.pool.shift());
 
-  // Reset sections
-  document.getElementById('gap-section').style.display           = 'none';
-  document.getElementById('answer-section').style.display        = 'none';
-  document.getElementById('hidden-answer-section').style.display = 'none';
-  document.getElementById('grade-row').style.display             = 'none';
-  document.getElementById('buildup-section').style.display       = 'none';
-  document.getElementById('audio-prompt-section').style.display  = 'none';
-
-  const tagsPrompt = document.getElementById('prompt-tags');
-  tagsPrompt.innerHTML = '';
-
-  if (card.direction === 'en2ru') {
-    document.getElementById('card-label').textContent           = 'ПРЕДЪЯВИТЬ ПЕРЕВОД ⟶';
-    document.getElementById('prompt-field-label').textContent   = 'ИСТОЧНИК · АНГЛИЙСКИЙ';
-    document.getElementById('prompt-text').textContent          = card.en;
-    document.getElementById('prompt-section').style.display     = 'block';
-    document.getElementById('audio-prompt-section').style.display = 'none';
-  } else {
-    document.getElementById('card-label').textContent           = 'ПРОСЛУШАТЬ И ПЕРЕВЕСТИ ⟶';
-    document.getElementById('prompt-field-label').textContent   = 'ИСТОЧНИК · РУССКИЙ';
-    document.getElementById('prompt-text').textContent          = '';
-    document.getElementById('prompt-section').style.display     = 'block';
-    document.getElementById('audio-prompt-section').style.display = 'block';
-    // Auto-play prompt for ru2en
-    setTimeout(() => playPromptAudio(), 300);
+  // 3. otherwise fast-forward to the soonest pending card
+  if (!pick && L.items.size) {
+    for (const e of L.items.values())
+      if (!pick || e.nextAt < pick.nextAt) pick = e;
   }
 
-  // Show gap after short delay
-  setTimeout(() => beginGap(), card.direction === 'ru2en' ? 800 : 400);
+  if (!pick || L.presented >= LESSON_CAP + 10) { showLessonDone(); return; }
+  showCard(pick);
+}
+
+// ── PRESENTATION (prompt → gap → reveal → echo → grade) ────
+function showCard(entry) {
+  current = entry;
+  const card = entry.card;
+  phase = 'prompt';
+  clearTimers();
+  lesson.counter++;
+  lesson.presented++;
+
+  document.getElementById('hdr-caso').textContent = card.id;
+  document.getElementById('hdr-rung').textContent = card.rung;
+  document.getElementById('card-clearance').textContent = 'УРОВЕНЬ ' + card.rung;
+
+  ['gap-section','answer-section','echo-section','buildup-section','audio-prompt-section']
+    .forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('grade-row').style.display = 'none';
+  document.getElementById('answer-hidden-wrap').style.display = 'block';
+  document.getElementById('answer-text-wrap').style.display = 'none';
+
+  const isComp = entry.mode === 'comprehension';
+  if (isComp) {
+    // ear first: play Russian, no text
+    document.getElementById('card-label').textContent = 'ПРОСЛУШАТЬ И ПОНЯТЬ';
+    document.getElementById('prompt-field-label').textContent = 'ЗАПИСЬ · РУССКИЙ';
+    document.getElementById('prompt-text').textContent = '';
+    document.getElementById('audio-prompt-section').style.display = 'block';
+    setTimeout(() => playPromptAudio(), 300);
+  } else {
+    document.getElementById('card-label').textContent = 'ПРЕДЪЯВИТЬ ПЕРЕВОД';
+    document.getElementById('prompt-field-label').textContent = 'ИСТОЧНИК · АНГЛИЙСКИЙ';
+    document.getElementById('prompt-text').textContent = card.en;
+  }
+
+  setTimeout(() => beginGap(), isComp ? 900 : 400);
+  updateServiceRecord();
 }
 
 function beginGap() {
   phase = 'gap';
-  const secs = currentCard.gap_seconds || 6;
-  gapRemaining = secs;
-
-  document.getElementById('gap-section').style.display           = 'block';
-  document.getElementById('hidden-answer-section').style.display = 'block';
+  const secs = current.card.gap_seconds || 6;
+  let remaining = secs;
+  document.getElementById('gap-section').style.display = 'block';
   updateGapBar(secs, secs);
-
   gapTimer = setInterval(() => {
-    gapRemaining -= 0.1;
-    updateGapBar(Math.max(gapRemaining, 0), secs);
-    if (gapRemaining <= 0) {
-      clearGapTimer();
-      revealAnswer();
+    remaining -= 0.1;
+    updateGapBar(Math.max(remaining, 0), secs);
+    if (remaining <= 0) {
+      clearInterval(gapTimer); gapTimer = null;
+      cueTone();                 // "produce now" cue
+      setTimeout(revealAnswer, 250);
     }
   }, 100);
 }
 
 function updateGapBar(remaining, total) {
-  const pct = (remaining / total) * 100;
-  document.getElementById('gap-bar').style.width   = pct + '%';
+  document.getElementById('gap-bar').style.width = (remaining / total) * 100 + '%';
   document.getElementById('gap-label').textContent = Math.ceil(remaining) + 'С';
 }
 
 function skipGap() {
   if (phase !== 'gap') return;
-  clearGapTimer();
+  clearInterval(gapTimer); gapTimer = null;
   revealAnswer();
 }
 
-function clearGapTimer() {
-  if (gapTimer) { clearInterval(gapTimer); gapTimer = null; }
+function clearTimers() {
+  if (gapTimer)  { clearInterval(gapTimer);  gapTimer = null; }
+  if (echoTimer) { clearInterval(echoTimer); echoTimer = null; }
 }
 
 function revealAnswer() {
   phase = 'reveal';
-  document.getElementById('gap-section').style.display           = 'none';
-  document.getElementById('hidden-answer-section').style.display = 'none';
+  document.getElementById('gap-section').style.display = 'none';
 
-  const card = currentCard;
-  document.getElementById('answer-text').textContent    = card.ru;
-  document.getElementById('answer-translit').textContent = card.translit || '';
+  const card = current.card;
+  const isComp = current.mode === 'comprehension';
 
-  // Grammar tags
+  // Confirmation: text stays hidden by default (ear-first); reveal is optional
+  document.getElementById('answer-field-label').textContent =
+    isComp ? 'ЗНАЧЕНИЕ · АНГЛИЙСКИЙ' : 'ВЕРНЫЙ ОТВЕТ · РУССКИЙ';
+  document.getElementById('answer-text').textContent =
+    isComp ? card.en : card.ru;
+  document.getElementById('answer-translit').textContent =
+    isComp ? '' : (card.translit || '');
+
   const atags = document.getElementById('answer-tags');
   atags.innerHTML = '';
   if (card.case_note)   atags.insertAdjacentHTML('beforeend', `<span class="gram-tag">${card.case_note}</span>`);
   if (card.aspect_note) atags.insertAdjacentHTML('beforeend', `<span class="gram-tag">${card.aspect_note}</span>`);
 
-  // For ru2en: show English answer
-  if (card.direction === 'ru2en') {
-    document.getElementById('prompt-field-label').textContent = 'ВЕРНЫЙ ОТВЕТ · АНГЛИЙСКИЙ';
-    document.getElementById('prompt-text').textContent = card.en;
-    document.getElementById('answer-section').querySelector('.field-label').textContent = 'РУССКИЙ ОРИГИНАЛ';
+  // In comprehension the meaning IS the answer — show it (it's English; the
+  // Russian ear-content stays audio). In production keep Russian text hidden.
+  if (isComp) {
+    document.getElementById('answer-hidden-wrap').style.display = 'none';
+    document.getElementById('answer-text-wrap').style.display = 'block';
   }
 
   document.getElementById('answer-section').style.display = 'block';
-  document.getElementById('grade-row').style.display      = 'flex';
+  document.getElementById('grade-row').style.display = 'flex';
 
-  // Backward buildup if chunks present
-  if (card.chunks && card.chunks.length > 0) {
-    renderBuildup(card.chunks);
-  }
+  // Confirm with the Russian audio, then the echo beat
+  setTimeout(async () => {
+    await playAnswerAudioAsync();
+    beginEcho();
+  }, 150);
 
-  // Auto-play answer audio
-  setTimeout(() => playAnswerAudio(), 200);
+  if (!isComp && card.chunks && card.chunks.length > 0) renderBuildup(card.chunks);
 }
 
+function revealText() {
+  document.getElementById('answer-hidden-wrap').style.display = 'none';
+  document.getElementById('answer-text-wrap').style.display = 'block';
+}
+
+// Echo: a second beat to repeat aloud, then one replay
+function beginEcho() {
+  if (phase !== 'reveal') return;
+  const el = document.getElementById('echo-section');
+  el.style.display = 'block';
+  let remaining = ECHO_SECONDS;
+  document.getElementById('echo-bar').style.width = '100%';
+  echoTimer = setInterval(() => {
+    remaining -= 0.1;
+    document.getElementById('echo-bar').style.width =
+      Math.max(remaining / ECHO_SECONDS * 100, 0) + '%';
+    if (remaining <= 0) {
+      clearInterval(echoTimer); echoTimer = null;
+      playAnswerAudio(); // one replay after the repeat beat
+    }
+  }, 100);
+}
+
+// ── GRADING (ladder unchanged; intra scheduler composes on top) ─
+async function grade(result) {
+  if (phase !== 'reveal') return;
+  clearTimers();
+  stampThunk();
+
+  const entry = current;
+  const card  = entry.card;
+  const now   = Date.now();
+  let rung    = card.rung;
+
+  // Cross-session ladder — unchanged semantics
+  if (result === 'got') {
+    rung = Math.min(rung + 1, 9);
+    card.due = now + LADDER_MS[rung];
+    lesson.correct++;
+  } else if (result === 'shaky') {
+    card.due = now + LADDER_MS[rung];
+  } else {
+    rung = Math.max(rung - 2, 0);
+    card.due = now + 30000;
+  }
+  card.rung = rung;
+  card.lastReviewed = now;
+
+  // Graduated introduction: comprehension flips to production after a clean hit
+  if (entry.mode === 'comprehension' && result === 'got' && card.direction !== 'ru2en') {
+    card.intro_state = 'production';
+    entry.mode = 'production';
+  }
+
+  // Intra-lesson scheduler: expanding re-surfacing within this sitting
+  if (result === 'got') {
+    entry.step++;
+    if (entry.step >= INTRA_STEPS.length) lesson.items.delete(card.id);
+    else entry.nextAt = lesson.counter + INTRA_STEPS[entry.step];
+  } else if (result === 'shaky') {
+    entry.nextAt = lesson.counter + INTRA_STEPS[Math.min(entry.step, INTRA_STEPS.length - 1)];
+  } else { // missed: restart the intra ladder
+    entry.step = 0;
+    entry.nextAt = lesson.counter + INTRA_STEPS[0];
+  }
+
+  lesson.graded++;
+  await txPut('cards', card);
+  updateServiceRecord();
+  nextPresentation(); // no stall — straight into the next beat
+}
+
+function showLessonDone() {
+  clearTimers();
+  document.getElementById('drill-area').style.display   = 'none';
+  document.getElementById('session-done').style.display = 'flex';
+  const L = lesson;
+  document.getElementById('done-stats').innerHTML =
+    `РАССМОТРЕНО: ${L.graded} ПРЕДЪЯВЛЕНИЙ<br>` +
+    `ОДОБРЕНО: ${L.correct}<br>` +
+    `ТОЧНОСТЬ: ${L.graded > 0 ? Math.round(L.correct / L.graded * 100) : 0}%<br><br>` +
+    `СМЕНА ${sessionNum} ЗАВЕРШЕНА`;
+  if (L.graded >= 5)
+    setTimeout(() => toast('РЕКОМЕНДУЕМ ЭКСПОРТ ДАННЫХ → ДОСЬЕ'), 1500);
+  refreshUI();
+}
+
+function endLesson() {
+  sessionNum++;
+  lesson = null;
+  if (wakeLock) { try { wakeLock.release(); } catch(e){} wakeLock = null; }
+  document.getElementById('session-done').style.display  = 'none';
+  document.getElementById('session-start').style.display = 'flex';
+  document.getElementById('hdr-caso').textContent = '----';
+  refreshUI();
+}
+
+function updateServiceRecord() {
+  const L = lesson;
+  const boxes = document.getElementById('stazh-boxes');
+  const info  = document.getElementById('session-info');
+  const slots = 10;
+  const frac  = L ? Math.min(L.presented / LESSON_CAP, 1) : 0;
+  let html = '';
+  for (let i = 0; i < slots; i++)
+    html += `<div class="stazh-box${i < Math.round(frac * slots) ? ' filled' : ''}"></div>`;
+  boxes.innerHTML = html;
+  info.textContent = `СМЕНА ${sessionNum}` + (L ? ` · ${L.presented}/${LESSON_CAP}` : '');
+}
+
+// ── BACKWARD BUILDUP ───────────────────────────────────────
 function renderBuildup(chunks) {
   document.getElementById('buildup-section').style.display = 'block';
   const container = document.getElementById('buildup-chunks');
   container.innerHTML = '';
-  // Show in reverse order (last chunk first = Pimsleur buildup)
   const reversed = [...chunks].reverse();
   reversed.forEach((chunk, i) => {
     const btn = document.createElement('button');
@@ -1133,110 +1362,92 @@ function renderBuildup(chunks) {
         <polygon points="3,2 13,8 3,14" fill="currentColor"/>
       </svg>
       ${chunk}`;
-    const c = chunk;
-    btn.onclick = () => speakRussian(stripAccents(c));
+    btn.onclick = () => playChunk(current.card.id, chunks.length, i, chunk);
     container.appendChild(btn);
   });
-  // Play buildup sequence automatically after reveal audio
-  setTimeout(() => playBuildup(reversed, 0), 1200);
+  setTimeout(() => playBuildup(reversed, 0), 1600);
 }
 
-async function playBuildup(chunks, idx) {
-  if (idx >= chunks.length) return;
-  await speakRussianAsync(stripAccents(chunks[idx]));
-  setTimeout(() => playBuildup(chunks, idx + 1), 600);
+async function playChunk(cardId, total, reversedIdx, text) {
+  // reversed order: reversedIdx 0 is the LAST chunk (index total-1)
+  const origIdx = total - 1 - reversedIdx;
+  const played = await playStoredAudio(`${cardId}_c${origIdx}`);
+  if (!played) speakRussian(stripAccents(text));
 }
 
-// ── GRADING ────────────────────────────────────────────────
-async function grade(result) {
-  if (phase !== 'reveal') return;
-  const card = currentCard;
-  const now  = Date.now();
-  let rung   = card.rung;
-
-  if (result === 'got') {
-    rung = Math.min(rung + 1, 9);
-    card.due = now + LADDER_MS[rung];
-    sessionCorrect++;
-  } else if (result === 'shaky') {
-    card.due = now + LADDER_MS[rung];
-  } else { // missed
-    rung = Math.max(rung - 2, 0);
-    card.due = now + 30000; // re-show in 30s
-    // Requeue
-    sessionQueue.push({ ...card, rung });
-  }
-
-  card.rung        = rung;
-  card.lastReviewed = now;
-  sessionGraded++;
-
-  await txPut('cards', card);
-  updateServiceRecord();
-
-  // Advance queue
-  sessionIdx++;
-  if (sessionIdx < sessionQueue.length) {
-    showCard(sessionQueue[sessionIdx]);
-  } else {
-    showSessionDone();
-  }
+async function playBuildup(reversedChunks, idx) {
+  if (!current || idx >= reversedChunks.length) return;
+  await playChunk(current.card.id, reversedChunks.length, idx, reversedChunks[idx]);
+  // echo pause between chunks for repeating aloud
+  setTimeout(() => playBuildup(reversedChunks, idx + 1), 1400);
 }
 
-function showSessionDone() {
-  document.getElementById('drill-area').style.display   = 'none';
-  document.getElementById('session-done').style.display = 'flex';
-  document.getElementById('done-stats').innerHTML =
-    `РАССМОТРЕНО: ${sessionGraded} КАРТ<br>` +
-    `ОДОБРЕНО: ${sessionCorrect}<br>` +
-    `ТОЧНОСТЬ: ${sessionGraded > 0 ? Math.round(sessionCorrect/sessionGraded*100) : 0}%<br><br>` +
-    `СМЕНА ${sessionNum} ЗАВЕРШЕНА`;
-
-  // Prompt export after session
-  if (sessionGraded >= 5) {
-    setTimeout(() => toast('РЕКОМЕНДУЕМ ЭКСПОРТ ДАННЫХ → ДОСЬЕ'), 1500);
-  }
-  refreshUI();
+// ── AUDIO PLAYBACK (cached blobs; Web Speech fallback) ─────
+function primeAudio() {
+  if (audioCtxPrimed) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+    audioCtxPrimed = true;
+  } catch(e) {}
+  const a = document.createElement('audio');
+  a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+  a.play().catch(()=>{});
 }
 
-function endSession() {
-  sessionNum++;
-  document.getElementById('session-done').style.display  = 'none';
-  document.getElementById('session-start').style.display = 'flex';
-  document.getElementById('hdr-caso').textContent = '----';
-  refreshUI();
+function cueTone() { // short "produce now" cue
+  try {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const g   = audioCtx.createGain();
+    osc.frequency.value = 880; osc.type = 'sine';
+    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.16);
+  } catch(e) {}
 }
 
-function updateServiceRecord() {
-  const total = sessionQueue.length;
-  const done  = sessionIdx;
-  const boxes = document.getElementById('stazh-boxes');
-  const info  = document.getElementById('session-info');
-
-  // 10 boxes representing session progress
-  const slots = 10;
-  let html = '';
-  for (let i = 0; i < slots; i++) {
-    const filled = total > 0 && i < Math.round((done / total) * slots);
-    html += `<div class="stazh-box${filled ? ' filled' : ''}"></div>`;
-  }
-  boxes.innerHTML = html;
-  info.textContent = `СМЕНА ${sessionNum} · ${total} КАРТ`;
+function stampThunk() { // mechanical stamp on grade
+  try {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const g   = audioCtx.createGain();
+    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.09);
+    osc.type = 'square';
+    g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.11);
+  } catch(e) {}
 }
 
-// ── AUDIO ──────────────────────────────────────────────────
 async function playAnswerAudio() {
-  if (!currentCard) return;
-  const key = currentCard.id + '_a';
-  const played = await playStoredAudio(key);
-  if (!played) speakRussian(stripAccents(currentCard.ru));
+  if (!current) return;
+  const played = await playStoredAudio(current.card.id + '_a');
+  if (!played) speakRussian(stripAccents(current.card.ru));
+}
+
+function playAnswerAudioAsync() {
+  return new Promise(async resolve => {
+    if (!current) { resolve(); return; }
+    const played = await playStoredAudioAwait(current.card.id + '_a');
+    if (played) { resolve(); return; }
+    await speakRussianAsync(stripAccents(current.card.ru));
+    resolve();
+  });
 }
 
 async function playPromptAudio() {
-  if (!currentCard) return;
-  const key = currentCard.id + '_p';
-  const played = await playStoredAudio(key);
-  if (!played) speakRussian(stripAccents(currentCard.ru));
+  if (!current) return;
+  const card = current.card;
+  const played = await playStoredAudio(card.id + '_p') || await playStoredAudio(card.id + '_a');
+  if (!played) speakRussian(stripAccents(card.ru));
 }
 
 async function playStoredAudio(key) {
@@ -1250,11 +1461,22 @@ async function playStoredAudio(key) {
   try { await audio.play(); return true; } catch(e) { return false; }
 }
 
+function playStoredAudioAwait(key) { // resolves when playback ENDS
+  return new Promise(async resolve => {
+    const row = await txGet('audio', key);
+    if (!row) { resolve(false); return; }
+    stopCurrentAudio();
+    const url = URL.createObjectURL(row.blob);
+    const audio = new Audio(url);
+    currentAudioSrc = audio;
+    audio.onended = () => { URL.revokeObjectURL(url); resolve(true); };
+    audio.onerror = () => resolve(false);
+    try { await audio.play(); } catch(e) { resolve(false); }
+  });
+}
+
 function stopCurrentAudio() {
-  if (currentAudioSrc) {
-    currentAudioSrc.pause();
-    currentAudioSrc = null;
-  }
+  if (currentAudioSrc) { currentAudioSrc.pause(); currentAudioSrc = null; }
   speechSynthesis.cancel();
 }
 
@@ -1262,10 +1484,8 @@ function speakRussian(text) {
   if (!text) return;
   speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'ru-RU';
-  utt.rate = 0.85;
-  const voices = speechSynthesis.getVoices();
-  const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+  utt.lang = 'ru-RU'; utt.rate = 0.85;
+  const ruVoice = speechSynthesis.getVoices().find(v => v.lang.startsWith('ru'));
   if (ruVoice) utt.voice = ruVoice;
   speechSynthesis.speak(utt);
 }
@@ -1275,65 +1495,159 @@ function speakRussianAsync(text) {
     if (!text) { resolve(); return; }
     speechSynthesis.cancel();
     const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = 'ru-RU';
-    utt.rate = 0.85;
-    const voices = speechSynthesis.getVoices();
-    const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+    utt.lang = 'ru-RU'; utt.rate = 0.85;
+    const ruVoice = speechSynthesis.getVoices().find(v => v.lang.startsWith('ru'));
     if (ruVoice) utt.voice = ruVoice;
-    utt.onend = resolve;
-    utt.onerror = resolve;
+    utt.onend = resolve; utt.onerror = resolve;
     speechSynthesis.speak(utt);
   });
 }
 
 function stripAccents(str) {
-  // Remove combining acute accent U+0301 and ́ HTML entity
-  return str.replace(/́/g, '').replace(/́/g, '');
+  return str.replace(/́/g, '');
+}
+
+// ── TTS PROVIDERS (in-app synth — backup path, never the drill hot path) ─
+// Provider = { id, label, listVoices(lang), synth(text, {voice}) -> Blob }
+function makeGoogleProvider(id, label, nameFilter) {
+  const key = () => {
+    const k = localStorage.getItem('tts_key') || '';
+    if (!k) throw new Error('НЕТ КЛЮЧА API');
+    return k;
+  };
+  return {
+    id, label,
+    async listVoices(lang = 'ru-RU') {
+      const r = await fetch(`https://texttospeech.googleapis.com/v1/voices?languageCode=${lang}&key=${key()}`);
+      if (!r.ok) throw new Error('voices ' + r.status);
+      const { voices = [] } = await r.json();
+      return voices.filter(v => nameFilter(v.name))
+                   .map(v => ({ name: v.name, gender: v.ssmlGender }));
+    },
+    async synth(text, { voice } = {}) {
+      // Chirp 3 HD: plain text only; speakingRate/pitch not honored
+      const r = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${key()}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: { text },
+          voice: { languageCode: 'ru-RU', name: voice },
+          audioConfig: { audioEncoding: 'MP3' }
+        })
+      });
+      if (!r.ok) throw new Error('synth ' + r.status);
+      const { audioContent } = await r.json();
+      return base64ToBlob(audioContent, 'audio/mpeg');
+    }
+  };
+}
+const stubTts = (id, label) => ({
+  id, label,
+  async listVoices() { throw new Error(label + ': скоро'); },
+  async synth()      { throw new Error(label + ': скоро'); }
+});
+const TTS_PROVIDERS = {
+  'google-chirp3hd': makeGoogleProvider('google-chirp3hd', 'Google Chirp 3: HD', n => n.includes('Chirp3-HD')),
+  'google-wavenet':  makeGoogleProvider('google-wavenet', 'Google WaveNet/Neural2', n => /Wavenet|Neural2/.test(n)),
+  'azure': stubTts('azure', 'Azure Speech'),
+  'polly': stubTts('polly', 'Amazon Polly')
+};
+
+function loadTtsSettings() {
+  document.getElementById('tts-provider').value = localStorage.getItem('tts_provider') || 'google-chirp3hd';
+  document.getElementById('tts-key').value      = localStorage.getItem('tts_key') || '';
+  const savedVoice = localStorage.getItem('tts_voice');
+  if (savedVoice) {
+    const sel = document.getElementById('tts-voice');
+    sel.innerHTML = `<option value="${savedVoice}">${savedVoice}</option>`;
+    sel.value = savedVoice;
+  }
+}
+function saveTtsSettings() {
+  localStorage.setItem('tts_provider', document.getElementById('tts-provider').value);
+  localStorage.setItem('tts_key',      document.getElementById('tts-key').value.trim());
+  const v = document.getElementById('tts-voice').value;
+  if (v) localStorage.setItem('tts_voice', v);
+}
+function currentTtsProvider() {
+  return TTS_PROVIDERS[document.getElementById('tts-provider').value];
+}
+
+async function loadVoices() {
+  try {
+    const voices = await currentTtsProvider().listVoices('ru-RU');
+    const sel = document.getElementById('tts-voice');
+    sel.innerHTML = voices.map(v =>
+      `<option value="${v.name}">${v.name} (${v.gender})</option>`).join('');
+    if (voices.length) { sel.value = voices[0].name; saveTtsSettings(); }
+    toast(`НАЙДЕНО ГОЛОСОВ: ${voices.length}`);
+  } catch(e) {
+    toast('ОШИБКА: ' + e.message);
+  }
+}
+
+async function synthMissingAudio() {
+  const provider = currentTtsProvider();
+  const voice = localStorage.getItem('tts_voice');
+  if (!voice) { toast('СНАЧАЛА ВЫБЕРИТЕ ГОЛОС'); return; }
+  const progress = document.getElementById('synth-progress');
+  try {
+    const cards = await txGetAll('cards');
+    const have  = new Set(await txGetAllKeys('audio'));
+    const jobs  = [];
+    for (const c of cards) {
+      if (!have.has(c.id + '_a')) jobs.push([c.id + '_a', stripAccents(c.ru)]);
+      if (c.direction === 'ru2en' && !have.has(c.id + '_p')) jobs.push([c.id + '_p', stripAccents(c.ru)]);
+      (c.chunks || []).forEach((ch, i) => {
+        if (!have.has(`${c.id}_c${i}`)) jobs.push([`${c.id}_c${i}`, stripAccents(ch)]);
+      });
+    }
+    if (!jobs.length) { toast('ВСЕ КАРТЫ УЖЕ ОЗВУЧЕНЫ'); return; }
+    let done = 0;
+    for (const [key, text] of jobs) {
+      progress.textContent = `СИНТЕЗ ${++done}/${jobs.length}: ${key}`;
+      const blob = await provider.synth(text, { voice });
+      await txPut('audio', { key, blob });
+      await new Promise(r => setTimeout(r, 120));
+    }
+    progress.textContent = '';
+    toast(`ОЗВУЧЕНО КЛИПОВ: ${jobs.length}`);
+  } catch(e) {
+    progress.textContent = '';
+    toast('ОШИБКА СИНТЕЗА: ' + e.message);
+  }
 }
 
 // ── NAVIGATION ─────────────────────────────────────────────
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.screen === name);
-  });
+  document.querySelectorAll('.nav-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.screen === name));
   document.getElementById(name + '-screen').classList.add('active');
-
   if (name === 'deck') renderDeckList();
   if (name === 'settings') refreshUI();
 }
-
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => showScreen(btn.dataset.screen));
-});
+document.querySelectorAll('.nav-btn').forEach(btn =>
+  btn.addEventListener('click', () => showScreen(btn.dataset.screen)));
 
 // ── DECK LIST ──────────────────────────────────────────────
 async function renderDeckList() {
   const cards = await txGetAll('cards');
   const body  = document.getElementById('deck-list-body');
   const empty = document.getElementById('deck-empty');
-
-  if (cards.length === 0) {
-    empty.style.display = 'block';
-    body.querySelectorAll('.deck-row').forEach(r => r.remove());
-    return;
-  }
+  body.querySelectorAll('.deck-row').forEach(r => r.remove());
+  if (cards.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
   const sorted = [...cards].sort((a, b) => a.id.localeCompare(b.id));
-  const now    = Date.now();
-
-  // Remove old rows
-  body.querySelectorAll('.deck-row').forEach(r => r.remove());
-
+  const now = Date.now();
   for (const c of sorted) {
-    const row  = document.createElement('div');
+    const row = document.createElement('div');
     row.className = 'deck-row';
-    const dueStr = c.due <= now
-      ? '<span class="due-now">СЕЙЧАС</span>'
+    const dueStr = isNewCard(c) ? '<span class="due-now">НОВАЯ</span>'
+      : c.due <= now ? '<span class="due-now">СЕЙЧАС</span>'
       : relTime(c.due - now);
     row.innerHTML =
-      `<span class="dr-num">ДЕЛО ${c.id}</span>` +
+      `<span class="dr-num">№ ${c.id}</span>` +
       `<span class="dr-en">${c.en}</span>` +
       `<span class="dr-rung">УР.${c.rung}</span>` +
       `<span class="dr-due">${dueStr}</span>`;
@@ -1353,8 +1667,10 @@ function relTime(ms) {
 function openCardModal(card) {
   showModal(
     `ДЕЛО № ${card.id}`,
-    `<b>${card.en}</b><br>${card.ru}<br><i>${card.translit}</i><br><br>` +
-    `Ступень: ${card.rung} · ${card.due <= Date.now() ? 'DUE NOW' : 'next in ' + relTime(card.due - Date.now())}`,
+    `<b>${card.en}</b><br>${card.ru}<br><i>${card.translit || ''}</i><br><br>` +
+    `Ступень: ${card.rung} · ` +
+    (isNewCard(card) ? 'новая' :
+      card.due <= Date.now() ? 'к повторению' : 'через ' + relTime(card.due - Date.now())),
     [
       { label: 'УДАЛИТЬ', cls: 'danger', action: () => deleteCard(card.id) },
       { label: 'ЗАКРЫТЬ', cls: '',       action: closeModal }
@@ -1364,8 +1680,8 @@ function openCardModal(card) {
 
 async function deleteCard(id) {
   await txDelete('cards', id);
-  await txDelete('audio', id + '_a');
-  await txDelete('audio', id + '_p');
+  const keys = await txGetAllKeys('audio');
+  for (const k of keys) if (k.startsWith(id + '_')) await txDelete('audio', k);
   closeModal();
   renderDeckList();
   refreshUI();
@@ -1375,19 +1691,19 @@ async function deleteCard(id) {
 // ── ADD CARD ───────────────────────────────────────────────
 function parsePasteRow(val) {
   const parts = val.split('|').map(s => s.trim());
-  if (parts.length >= 1) document.getElementById('add-en').value      = parts[0] || '';
-  if (parts.length >= 2) document.getElementById('add-ru').value      = parts[1] || '';
+  if (parts.length >= 1) document.getElementById('add-en').value       = parts[0] || '';
+  if (parts.length >= 2) document.getElementById('add-ru').value       = parts[1] || '';
   if (parts.length >= 3) document.getElementById('add-translit').value = parts[2] || '';
 }
 
 async function submitCard() {
-  const en      = document.getElementById('add-en').value.trim();
-  const ru      = document.getElementById('add-ru').value.trim();
+  const en       = document.getElementById('add-en').value.trim();
+  const ru       = document.getElementById('add-ru').value.trim();
   const translit = document.getElementById('add-translit').value.trim();
-  const caseNote  = document.getElementById('add-case').value.trim();
+  const caseNote   = document.getElementById('add-case').value.trim();
   const aspectNote = document.getElementById('add-aspect').value.trim();
-  const direction = document.getElementById('add-direction').value;
-  const gap       = parseInt(document.getElementById('add-gap').value) || 6;
+  const direction  = document.getElementById('add-direction').value;
+  const gap        = parseInt(document.getElementById('add-gap').value) || 6;
 
   if (!en || !ru) { toast('ПОЛЯ EN И RU ОБЯЗАТЕЛЬНЫ'); return; }
 
@@ -1398,13 +1714,13 @@ async function submitCard() {
     case_note: caseNote, aspect_note: aspectNote,
     direction, gap_seconds: gap,
     chunks: [], rung: 0, due: 0,
+    intro_state: 'new',
     created: now, lastReviewed: 0
   };
   await txPut('cards', card);
 
-  // Clear fields
   ['add-en','add-ru','add-translit','add-case','add-aspect','paste-input']
-    .forEach(id => document.getElementById(id).value = '');
+    .forEach(i => document.getElementById(i).value = '');
   document.getElementById('add-gap').value = '6';
 
   toast('КАРТА ПОДАНА: ' + id);
@@ -1421,24 +1737,14 @@ async function nextId() {
   return String(maxNum + 1).padStart(4, '0');
 }
 
-// ── IMPORT / EXPORT ────────────────────────────────────────
+// ── IMPORT / EXPORT (format unchanged) ─────────────────────
 async function exportDeck(withAudio) {
   const cards = await txGetAll('cards');
-  const data  = {
-    version: 1,
-    exported_at: new Date().toISOString(),
-    cards,
-    audio: {}
-  };
-
+  const data = { version: 1, exported_at: new Date().toISOString(), cards, audio: {} };
   if (withAudio) {
     const audioRows = await txGetAll('audio');
-    for (const row of audioRows) {
-      const b64 = await blobToBase64(row.blob);
-      data.audio[row.key] = b64;
-    }
+    for (const row of audioRows) data.audio[row.key] = await blobToBase64(row.blob);
   }
-
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -1458,14 +1764,12 @@ function importDeck(input) {
       const data = JSON.parse(e.target.result);
       let imported = 0;
       if (Array.isArray(data)) {
-        // bare array
         for (const c of data) { await txPut('cards', c); imported++; }
       } else if (data.cards) {
         for (const c of data.cards) { await txPut('cards', c); imported++; }
         if (data.audio) {
           for (const [key, b64] of Object.entries(data.audio)) {
-            const blob = await base64ToBlob(b64);
-            await txPut('audio', { key, blob });
+            await txPut('audio', { key, blob: base64ToBlob(b64) });
           }
         }
       }
@@ -1480,10 +1784,6 @@ function importDeck(input) {
   reader.readAsText(file);
 }
 
-function importAudioPack() {
-  document.getElementById('import-audio-file').click();
-}
-
 function importAudioPackFile(input) {
   const file = input.files[0];
   if (!file) return;
@@ -1493,8 +1793,7 @@ function importAudioPackFile(input) {
       const pack = JSON.parse(e.target.result);
       let count = 0;
       for (const [key, b64] of Object.entries(pack)) {
-        const blob = await base64ToBlob(b64, 'audio/mpeg');
-        await txPut('audio', { key, blob });
+        await txPut('audio', { key, blob: base64ToBlob(b64, 'audio/mpeg') });
         count++;
       }
       toast(`ИМПОРТИРОВАНО ${count} АУДИОКЛИПОВ`);
@@ -1524,67 +1823,44 @@ function base64ToBlob(b64, mime = 'audio/mpeg') {
 
 // ── DANGER ZONE ────────────────────────────────────────────
 function confirmClearDeck() {
-  showModal(
-    'ОЧИСТИТЬ КАРТОТЕКУ?',
+  showModal('ОЧИСТИТЬ КАРТОТЕКУ?',
     'Все карты и прогресс будут удалены безвозвратно.',
-    [
-      { label: 'УНИЧТОЖИТЬ', cls: 'danger', action: clearDeck },
-      { label: 'ОТМЕНА',     cls: '',       action: closeModal }
-    ]
-  );
+    [ { label: 'УНИЧТОЖИТЬ', cls: 'danger', action: clearDeck },
+      { label: 'ОТМЕНА',     cls: '',       action: closeModal } ]);
 }
-
 async function clearDeck() {
-  await txClear('cards');
-  await txClear('audio');
-  closeModal();
-  renderDeckList();
-  refreshUI();
+  await txClear('cards'); await txClear('audio');
+  closeModal(); renderDeckList(); refreshUI();
   toast('КАРТОТЕКА ОЧИЩЕНА');
 }
-
 function confirmResetProgress() {
-  showModal(
-    'СБРОСИТЬ ПРОГРЕСС?',
+  showModal('СБРОСИТЬ ПРОГРЕСС?',
     'Все ступени будут обнулены. Карты сохранятся.',
-    [
-      { label: 'СБРОСИТЬ', cls: 'danger', action: resetProgress },
-      { label: 'ОТМЕНА',   cls: '',       action: closeModal }
-    ]
-  );
+    [ { label: 'СБРОСИТЬ', cls: 'danger', action: resetProgress },
+      { label: 'ОТМЕНА',   cls: '',       action: closeModal } ]);
 }
-
 async function resetProgress() {
   const cards = await txGetAll('cards');
   for (const c of cards) {
-    c.rung = 0; c.due = 0; c.lastReviewed = 0;
+    c.rung = 0; c.due = 0; c.lastReviewed = 0; c.intro_state = 'new';
     await txPut('cards', c);
   }
-  closeModal();
-  refreshUI();
+  closeModal(); refreshUI();
   toast('ПРОГРЕСС СБРОШЕН');
 }
-
 function confirmNuke() {
-  showModal(
-    'УДАЛИТЬ ВСЁ?',
+  showModal('УДАЛИТЬ ВСЁ?',
     'База данных будет полностью уничтожена. Экспортируйте данные перед этим!',
-    [
-      { label: 'УНИЧТОЖИТЬ ВСЁ', cls: 'danger', action: nukeAll },
-      { label: 'ОТМЕНА',          cls: '',        action: closeModal }
-    ]
-  );
+    [ { label: 'УНИЧТОЖИТЬ ВСЁ', cls: 'danger', action: nukeAll },
+      { label: 'ОТМЕНА',          cls: '',        action: closeModal } ]);
 }
-
 async function nukeAll() {
-  await txClear('cards');
-  await txClear('audio');
-  closeModal();
-  refreshUI();
+  await txClear('cards'); await txClear('audio');
+  closeModal(); refreshUI();
   toast('ДАННЫЕ УНИЧТОЖЕНЫ');
 }
 
-// ── MODAL ──────────────────────────────────────────────────
+// ── MODAL / TOAST ──────────────────────────────────────────
 function showModal(title, body, actions) {
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').innerHTML    = body;
@@ -1599,7 +1875,6 @@ function showModal(title, body, actions) {
   }
   document.getElementById('modal-overlay').classList.add('open');
 }
-
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('open');
 }
@@ -1607,7 +1882,6 @@ document.getElementById('modal-overlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeModal();
 });
 
-// ── TOAST ──────────────────────────────────────────────────
 let toastTimer = null;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -1619,9 +1893,8 @@ function toast(msg) {
 
 // ── SERVICE WORKER ─────────────────────────────────────────
 function registerSW() {
-  if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator)
     navigator.serviceWorker.register('sw.js').catch(() => {});
-  }
 }
 
 // ── BOOT ───────────────────────────────────────────────────

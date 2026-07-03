@@ -1,12 +1,17 @@
 // Service Worker — Russian Drill PWA
-const CACHE = 'russian-drill-v1';
+const CACHE = 'russian-drill-v2';
 const SHELL = [
   './',
   './index.html',
   './manifest.json',
-  './fonts/Handjet-Regular.woff2',
-  './fonts/IBMPlexMono-Regular.woff2',
-  './fonts/IBMPlexMono-Bold.woff2',
+  './fonts/StalinistOne-cyr.woff2',
+  './fonts/PTSansNarrow-Bold-cyr.woff2',
+  './fonts/PTSansNarrow-Bold-lat.woff2',
+  './fonts/PTSans-Regular-cyr.woff2',
+  './fonts/PTSans-Regular-lat.woff2',
+  './fonts/PTSans-Bold-cyr.woff2',
+  './fonts/PTSans-Bold-lat.woff2',
+  './fonts/PTSans-Italic-lat.woff2',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './deck.json',

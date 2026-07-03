@@ -25,30 +25,28 @@ A single-file installable PWA for relearning Russian by the Pimsleur method, ski
 | `deck.json` | 10 seed cards loaded on first run |
 | `gen_audio.mjs` | Offline script: generate TTS audio from your deck |
 | `gen_icons.mjs` | Generate PWA icons (requires `sharp`) |
-| `fonts/` | Self-hosted Handjet + IBM Plex Mono (Cyrillic) |
+| `fonts/` | Self-hosted Stalinist One + PT Sans / PT Sans Narrow (Cyrillic + Latin) |
 | `icons/` | PWA home-screen icons |
 
 ---
 
 ## The Drill Loop (Pimsleur method)
 
-Each card runs four phases:
+A lesson (СМЕНА) is a **bounded sitting**: up to 4 new cards mixed with due reviews, capped at ~30 presentations, with a clear start (ЗАСТУПИТЬ НА ПОСТ — also unlocks iOS audio) and a lesson-complete stamp at the end.
 
-**en2ru (production — default):**
-1. **PROMPT** — English shown. Russian hidden.
-2. **GAP** — Countdown timer. Say the Russian aloud.
-3. **REVEAL** — Stress-marked Russian + transliteration shown. Audio plays.
-4. **GRADE** — Three stamps advance the spaced-repetition ladder.
+Each presentation runs ear-first, text hidden by default:
 
-**ru2en (comprehension):**
-1. **PROMPT** — Russian audio plays. Text hidden.
-2. **GAP** — Say the English aloud.
-3. **REVEAL** — English + Russian shown.
-4. **GRADE** — As above.
+1. **PROMPT** — new/comprehension cards: Russian audio plays, no text. Production cards: English shown.
+2. **GAP** — enforced anticipation beat with countdown. Produce the answer aloud. A cue tone marks "produce now"; tap to skip early.
+3. **CONFIRM** — Russian audio plays. Text stays hidden (ПОКАЗАТЬ ТЕКСТ reveals it).
+4. **ECHO** — a second short beat to repeat aloud, then one replay.
+5. **GRADE** — three stamps; grading never stalls the flow.
 
-Tap the obscured answer during the gap to skip early.
+**Graduated introduction:** a brand-new card enters in *comprehension* (hear Russian → grasp meaning). After a clean hit it flips to *production* (English → produce Russian). Tracked per card as `intro_state: new → comprehension → production`.
 
-**Backward buildup:** Cards with `chunks[]` play each chunk from last to first, then the full phrase — the Pimsleur long-sentence drill.
+**Intra-lesson graduated recall:** separate from the ladder, new or missed cards re-surface *within the same lesson* at expanding spacings — after 1, 3, 7, then 15 intervening items. The ladder decides what is due today; this scheduler decides ordering within the sitting.
+
+**Backward buildup:** Cards with `chunks[]` play each chunk from last to first with echo pauses — the Pimsleur long-sentence drill.
 
 ---
 
@@ -97,18 +95,25 @@ Use U+0301 combining acute accent for stress marks in `ru` (e.g. `е́`). The au
 
 ## Audio Generation
 
-The app falls back to Web Speech API (`ru-RU`) by default. For pre-generated audio:
+Any audio source can drive the deck through one provider interface; **Google Chirp 3: HD** Russian is the primary one. Clips are generated once, cached in IndexedDB, and never re-synthesized at review time. Missing clips fall back to Web Speech (`ru-RU`).
 
-1. Get a [Google Cloud TTS API key](https://console.cloud.google.com/apis/credentials) (free tier covers thousands of cards)
-2. Run the generator:
+**Offline generator (preferred):**
+
+1. Get a [Google Cloud TTS API key](https://console.cloud.google.com/apis/credentials)
+2. List live Chirp 3 HD voices, then generate:
    ```bash
-   node gen_audio.mjs --key YOUR_API_KEY --deck deck.json --out audio_pack.json
+   GOOGLE_TTS_API_KEY=... node gen_audio.mjs --list-voices
+   GOOGLE_TTS_API_KEY=... node gen_audio.mjs --voice ru-RU-Chirp3-HD-Aoede
    ```
 3. In the app: ПОДАТЬ → ИМПОРТ АУДИО → select `audio_pack.json`
 
-Optional flags: `--voice ru-RU-Chirp3-HD-Aoede` (best quality), `--rate 0.85`
+Flags: `--provider google-chirp3hd | google-wavenet` (azure/polly are stubs), `--deck`, `--out`, `--voice`. The key is read from the environment only — never committed, never shipped in the bundle. Note Chirp 3 HD takes plain text only (no SSML) and ignores rate/pitch; pacing comes from the app's gap timing.
 
-**iOS Web Speech:** requires Russian voice installed under  
+**In-app synth (backup):** ДОСЬЕ → ЗВУКОЗАПИСЬ — pick a provider, paste a key (stored only in on-device localStorage, at your own risk), load the live voice list, and synthesize clips for cards missing audio.
+
+**Stored clips:** open-licensed recordings (Tatoeba, Forvo) or tutor audio can be imported as an audio pack `{ "<id>_a": "<base64>" }` keyed by card id.
+
+**iOS Web Speech fallback:** requires a Russian voice installed under  
 Settings → Accessibility → Spoken Content → Voices → Russian
 
 ---
